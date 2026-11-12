@@ -51,6 +51,16 @@ object Labels {
         LightBand.GLARE -> R.string.light_glare
     }
 
+    /** Reader.CHOICES by their Tesseract codes. */
+    fun reading(codes: String): Int = when (codes) {
+        "mal+eng" -> R.string.read_mal_eng
+        "hin+eng" -> R.string.read_hin_eng
+        "tam+eng" -> R.string.read_tam_eng
+        "kan+eng" -> R.string.read_kan_eng
+        "tel+eng" -> R.string.read_tel_eng
+        else -> R.string.read_eng
+    }
+
     fun said(context: Context, s: Said): String {
         val names = s.modes.map { context.getString(mode(it)) }
         return context.getString(line(s.line), *names.toTypedArray())

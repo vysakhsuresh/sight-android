@@ -9,6 +9,10 @@ own data (Ikshana keeps none yet).
 
 0. **CI's first run on GitHub** (`android.yml`) after the push of 12 Nov. Seen when both jobs
    are green, or the failure is named here.
+0a. **Read a real page and a medicine strip** with the interim reader: Malayalam and English
+   (default), then each other language from Settings, Reading. Seen when the right words are
+   heard in the right voice and no line is said twice while the phone sweeps. Log
+   `IkshanaRead` for the time per frame. Then a bus board outdoors.
 1. **Hear the start and the light level** on the moto: "Ikshana.", the fallback sentence, then
    one light band and **no** "Dark." in a lit room (the 1.5 s settle). Cover the lens: "Dark."
    once; uncover: one band, no flicker between bands while the phone is still.

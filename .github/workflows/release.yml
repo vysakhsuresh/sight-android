@@ -53,6 +53,8 @@ jobs:
           if [ -z "$KEYSTORE_B64" ]; then echo "No signing key in the secrets: unsigned build."; exit 0; fi
           echo "$KEYSTORE_B64" | base64 -d > release.jks
           printf 'storeFile=%s\nstorePassword=%s\nkeyAlias=%s\nkeyPassword=%s\n' "$PWD/release.jks" "$STORE_PASSWORD" "$KEY_ALIAS" "$KEY_PASSWORD" > keystore.properties
+      - name: Fetch the interim Read models (pinned, checked)
+        run: bash tools/models/fetch_tessdata.sh
       - name: Tests, lint, release APK
         run: ./gradlew :engine:test lintRelease assembleRelease --console plain
       - name: Verify merged manifests

@@ -72,13 +72,20 @@ fixes the false "Dark." is built and not yet seen (`PENDING_TESTS` 1).
 
 ## P2 — Read (v0.1)
 
+**Interim, at the owner's request (12 Nov):** live Read runs now on a borrowed recogniser
+(Tesseract fast, Apache-2.0; `docs/MODELS.md`), with the engine's rules in front of the voice
+(`ReadTextChecks`: junk dropped, a line never said twice, the sideways sensor plane turned upright,
+each line in its script's voice, "nothing found" paced). Seen on the moto: the reader opens and
+reads a frame in 350-530 ms. *Not seen:* text read correctly, heard. The items below stand: our own
+OCR replaces it by score.
+
 - [ ] 11. The camera frame path (YUV to the model with no UI-thread copy; frame skip; the gate in
   front). Check: 30 fps preview with the gate running, UI thread under 4 ms (`dumpsys gfxinfo`).
 - [ ] 12. The synthetic text pipeline under `tools/models/ocr/`, every real set's licence pinned first.
 - [ ] 13. Detector (~15M) and recogniser (~10M, a head per script), exported to LiteRT, checked
   against the reference run on a held-out image. Gate: Malayalam CER under 8% on the clean two
   thirds, in `docs/MODELS.md`.
-- [ ] 14. Reading order and script identification (`ReadingOrderChecks`, `ScriptChecks`).
+- [~] 14. Reading order and script identification (script to voice built: `Scripts.localeOf`, in `ReadTextChecks`; reading order is Tesseract's for now) (`ReadingOrderChecks`, `ScriptChecks`).
 - [ ] 15. Field rules: expiry, dose, MRP, amount, phone, PIN, bus, platform (`FieldChecks`).
 - [ ] 16. TTS: Squish's Indic voices, system TTS fallback, normalisation (`SpeakChecks` under
   ml-IN, hi-IN, ta-IN).

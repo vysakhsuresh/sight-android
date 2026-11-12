@@ -64,7 +64,7 @@ android {
     androidResources {
         generateLocaleConfig = true
         // Memory-mapped by the model runners from P2, which a compressed asset cannot be.
-        noCompress += listOf("tflite", "bin")
+        noCompress += listOf("tflite", "bin", "traineddata")
     }
 
     // Every language rides in every install, as Stave: the app chooses its own language, and a
@@ -121,6 +121,10 @@ dependencies {
     implementation(libs.androidx.camera.camera2)
     implementation(libs.androidx.camera.lifecycle)
     implementation(libs.androidx.camera.view)
+
+    // Read, interim (Apache-2.0): Tesseract's LSTM recogniser, offline, five Indian scripts and
+    // English. Replaced script by script by our own OCR when it scores better (docs/MODELS.md).
+    implementation(libs.tesseract4android)
 }
 
 // DEPENDENCIES DELIBERATELY NOT HERE

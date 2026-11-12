@@ -9,6 +9,7 @@ object Registry {
         LightChecks,
         GestureChecks,
         EarconChecks,
+        ReadTextChecks,
         RunnerChecks
     )
 }

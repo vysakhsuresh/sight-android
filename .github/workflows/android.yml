@@ -47,6 +47,8 @@ jobs:
       - name: Install Android SDK packages
         run: '"$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;36.0.0" "platform-tools"'
       - uses: gradle/actions/setup-gradle@v4
+      - name: Fetch the interim Read models (pinned, checked)
+        run: bash tools/models/fetch_tessdata.sh
       - name: Engine tests, lint, debug APK and release APK
         run: ./gradlew :engine:test lintDebug assembleDebug assembleRelease --console plain
       - name: Failed unit tests, with their messages

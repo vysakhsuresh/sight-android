@@ -13,6 +13,9 @@ camerax = "1.4.2"
 # LiteRT (Apache-2.0). Squish found TensorFlow Lite 2.16.1 ran converted models wrong without
 # refusing them; 1.4.0 is the floor and never goes back. Declared now, used from P2.
 litert = "1.4.0"
+# Tesseract 5 for Android (Apache-2.0; Leptonica BSD-2), the interim Read recogniser until our
+# own OCR beats it on the Ikshana set (docs/MODELS.md). Language data: tools/models/fetch_tessdata.sh.
+tesseract4android = "4.9.0"
 junit = "4.13.2"
 
 [libraries]
@@ -38,4 +41,5 @@ androidx-camera-camera2 = { group = "androidx.camera", name = "camera-camera2", 
 androidx-camera-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "camerax" }
 androidx-camera-view = { group = "androidx.camera", name = "camera-view", version.ref = "camerax" }
 litert = { group = "com.google.ai.edge.litert", name = "litert", version.ref = "litert" }
+tesseract4android = { group = "cz.adaptech.tesseract4android", name = "tesseract4android", version.ref = "tesseract4android" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }

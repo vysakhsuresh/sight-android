@@ -22,6 +22,11 @@ seen), launched with `am start`. No taps were sent by this session.
   settings glyph "≡" was exposed as text beside the name, which TalkBack would read; cleared.
   The mode states (`stateDescription`) do not appear in a dump and were not heard.
 - **Permissions on the phone** (`dumpsys package`): requested CAMERA and VIBRATE, nothing else.
+- **Read, interim (later build, 16:06):** the reader opened with Malayalam and English and read
+  each upright frame (960 x 1280) in 350-530 ms on the analysis thread. The lens was covered
+  (black preview), so no text was found; after 4 s it said "Nothing found. It is too dark; more
+  light, please." once, as paced. Choosing Money, Translate or Ask now says "… is not on this
+  phone yet. Read is on instead." (logged). Text read from a real page: **not yet seen.**
 - **Someone used it.** Between 15:36:09 and 15:36:49 the log shows Describe, Find, Translate, Ask,
   Read, Money, Describe and Ask chosen in turn, each answered by the fallback earcon and its
   sentence (`<mode> is not on this phone yet. Light level is on instead.`). These were not this

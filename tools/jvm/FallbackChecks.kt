@@ -34,7 +34,7 @@ object FallbackChecks : Suite {
         setOf(Models.OCR_DETECTOR, Models.OCR_RECOGNISER),
         setOf(Models.OCR_DETECTOR_LITE, Models.OCR_RECOGNISER_LITE),
         setOf(Models.CURRENCY), setOf(Models.VLM), setOf(Models.VLM_LITE),
-        setOf(Models.TRANSLATE), setOf(Models.TRANSLATE_LITE)
+        setOf(Models.TRANSLATE), setOf(Models.TRANSLATE_LITE), setOf(Models.OCR_TESSERACT)
     )
 
     private fun runnable(s: State): Boolean {
@@ -178,6 +178,15 @@ object FallbackChecks : Suite {
         // A crash with the camera gone still says how to get it back.
         st = ModeMachine.step(State.initial(all, CameraState.DENIED), Event.Started(Mode.FIND, true))
         check(st.spoken == listOf(Said(Line.RESTARTED, listOf(Mode.HELP)), Said(Line.NO_CAMERA))) { "restart without camera: ${st.spoken}" }
+        // Only the interim reader in the pack: Read is Read, said plainly, not "the lighter model".
+        val interim = ModeMachine.step(State.initial(setOf(Models.OCR_TESSERACT), CameraState.GRANTED), Event.Started(Mode.READ, false))
+        check(interim.spoken == listOf(Said(Line.WELCOME)) && interim.state.active == Mode.READ) { "interim start: ${interim.spoken}" }
+        st = ModeMachine.step(interim.state, Event.Choose(Mode.READ))
+        check(st.spoken == listOf(Said(Line.MODE_ON, listOf(Mode.READ))) && Effect.Sound(Earcon.MODE) in st.effects) { "interim Read: ${st.effects}" }
+        // Ours in the pack but failing here: then the interim one is the lighter one, and says so.
+        val both = State.initial(setOf(Models.OCR_DETECTOR, Models.OCR_RECOGNISER, Models.OCR_TESSERACT), CameraState.GRANTED)
+        st = ModeMachine.step(ModeMachine.step(both, Event.Started(Mode.READ, false)).state, Event.ModelFailed(Models.OCR_RECOGNISER))
+        check(st.spoken == listOf(Said(Line.LIGHTER, listOf(Mode.READ))) && st.state.tier == 2) { "ours failing: ${st.spoken}" }
         // Heat, both ways.
         st = ModeMachine.step(full, Event.Thermal(true))
         check(st.spoken == listOf(Said(Line.WARM))) { "warm: ${st.spoken}" }

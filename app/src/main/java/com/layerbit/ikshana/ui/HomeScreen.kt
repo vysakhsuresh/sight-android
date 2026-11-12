@@ -252,8 +252,23 @@ private fun SettingsPanel(session: Session, onClose: () -> Unit) {
             Text(stringResource(R.string.settings), style = MaterialTheme.typography.titleLarge, color = Ink.Text)
             SwitchRow(stringResource(R.string.settings_earcons), session.earcons) { session.switchEarcons(it) }
             SwitchRow(stringResource(R.string.settings_haptics), session.haptics) { session.switchHaptics(it) }
+            ChoiceRow(stringResource(R.string.settings_reading), stringResource(Labels.reading(session.readLanguagesShown))) { session.nextReadLanguages() }
             BigButton(stringResource(R.string.settings_close), primary = true, onClick = onClose)
         }
+    }
+}
+
+/** A setting with several values: a tap moves to the next, and the row's text says which is on. */
+@Composable
+private fun ChoiceRow(label: String, value: String, onNext: () -> Unit) {
+    Row(
+        Modifier.fillMaxWidth().heightIn(min = Target).clip(RoundedCornerShape(14.dp))
+            .clickable(role = Role.Button, onClick = onNext)
+            .padding(horizontal = 12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(label, Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge, color = Ink.Text)
+        Text(value, style = MaterialTheme.typography.bodyLarge, color = Ink.Iris)
     }
 }
 

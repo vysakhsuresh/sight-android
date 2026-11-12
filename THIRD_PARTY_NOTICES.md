@@ -15,6 +15,8 @@ Last updated: 12 November 2026.
 | AndroidX Core, Activity, Lifecycle, Annotation, Startup | Apache-2.0 | `:app` (`gradle/libs.versions.toml`) | 12 Nov 2026 |
 | Jetpack Compose (runtime, foundation, animation, ui, material3), BOM 2025.09.01 | Apache-2.0 | `:app` | 12 Nov 2026 |
 | CameraX 1.4.2 (core, camera2, lifecycle, view) | Apache-2.0 | `:app` | 12 Nov 2026 |
+| Tesseract OCR 5 (via tesseract4android 4.9.0, Robert Pösel) | Apache-2.0 | `:app`, from JitPack, filtered to its one group | 12 Nov 2026 |
+| Leptonica (inside tesseract4android) | BSD-2-Clause | `:app` | 12 Nov 2026 |
 | Space Grotesk, Florian Karsten | SIL Open Font License 1.1 | `app/src/main/res/font/space_grotesk_*.ttf` (copied from Stave) | 12 Nov 2026 |
 
 LiteRT 1.4.0 (Apache-2.0) is named in the version catalogue and is **not yet a dependency**; it
@@ -40,7 +42,11 @@ its first lines.
 
 ## Models
 
-None yet. Every model gets a row here and in `docs/MODELS.md` the day it is added: its licence,
+| Model | Licence | Source | Size | Tier |
+|---|---|---|---|---|
+| Tesseract `tessdata_fast` LSTM recognisers: eng, mal, hin, tam, kan, tel | Apache-2.0 (the repository's LICENSE, read 12 Nov 2026) | github.com/tesseract-ocr/tessdata_fast at commit 87416418657359cb625c412a48b6e1d6d41c29bd, SHA-256 pinned in `tools/models/fetch_tessdata.sh` | 20.1 MB together | **borrowed, interim** (see `docs/MODELS.md`) |
+
+Every model gets a row here and in `docs/MODELS.md` the day it is added: its licence,
 its source, its size, and whether it is fully ours, trained by us on open data, or fine-tuned
 from open weights.
 

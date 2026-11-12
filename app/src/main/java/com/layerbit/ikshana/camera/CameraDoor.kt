@@ -21,8 +21,10 @@ import java.util.concurrent.Executors
  *
  * Analysis runs on its own thread with KEEP_ONLY_LATEST, so a slow mode drops frames rather than
  * queueing them; the UI thread never touches a frame (P2, item 11, measures this on the moto).
- * The analysis size is about 640 x 480: enough for the light level and the frame gate, and the
- * OCR path picks its own size in P2.
+ * The analysis size is about 1280 x 960: small print on a medicine strip needs the pixels, and
+ * the light level samples a grid of it anyway. Each settled frame goes to [onFrame] on the
+ * analysis thread, which may take as long as the mode needs (the recogniser takes most of a
+ * second); frames that arrive meanwhile are dropped, never queued.
  *
  * The camera's own state (opened, in use by another app, disabled by policy) is reported as the
  * mode machine's CameraState, so "another app is using the camera" is spoken rather than shown as
@@ -31,12 +33,13 @@ import java.util.concurrent.Executors
 class CameraDoor(
     private val context: Context,
     private val onCamera: (CameraState) -> Unit,
-    private val onLuma: (Double) -> Unit
+    private val onFrame: (Frame) -> Unit
 ) {
+    /** One settled luma plane, as the sensor gives it (not yet rotated upright). */
+    class Frame(val y: ByteArray, val width: Int, val height: Int, val rowStride: Int, val rotation: Int)
+
     private val analysisThread = Executors.newSingleThreadExecutor()
     private var provider: ProcessCameraProvider? = null
-    /** Light level is spoken twice a second at most; analysing more often only warms the phone. */
-    private var lastAnalysis = 0L
     /** When this binding's first frame arrived; auto-exposure is still moving until SETTLE_MS after it. */
     private var firstFrame = 0L
 
@@ -50,7 +53,7 @@ class CameraDoor(
                 val analysis = ImageAnalysis.Builder()
                     .setResolutionSelector(
                         ResolutionSelector.Builder().setResolutionStrategy(
-                            ResolutionStrategy(Size(640, 480), ResolutionStrategy.FALLBACK_RULE_CLOSEST_HIGHER_THEN_LOWER)
+                            ResolutionStrategy(Size(1280, 960), ResolutionStrategy.FALLBACK_RULE_CLOSEST_HIGHER_THEN_LOWER)
                         ).build()
                     )
                     .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
@@ -59,14 +62,13 @@ class CameraDoor(
                     try {
                         val now = System.currentTimeMillis()
                         if (firstFrame == 0L) firstFrame = now
-                        if (now - firstFrame >= LightLevel.SETTLE_MS && now - lastAnalysis >= 500) {
-                            lastAnalysis = now
+                        if (now - firstFrame >= LightLevel.SETTLE_MS) {
                             val plane = image.planes[0]
                             val buf = plane.buffer
                             val bytes = ByteArray(buf.remaining())
                             buf.get(bytes)
                             // pixelStride is 1 for the Y plane of YUV_420_888 by the format's definition.
-                            onLuma(LightLevel.meanLuma(bytes, image.width, image.height, plane.rowStride))
+                            onFrame(Frame(bytes, image.width, image.height, plane.rowStride, image.imageInfo.rotationDegrees))
                         }
                     } finally {
                         image.close()

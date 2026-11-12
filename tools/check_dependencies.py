@@ -33,6 +33,7 @@ PROVIDED_BY = {
     "androidx.camera.lifecycle": "androidx.camera.lifecycle",
     "androidx.camera.view": "androidx.camera.view",
     "androidx.camera.core": "androidx.camera.core",
+    "com.googlecode.tesseract.android": "tesseract4android",
     "com.google.ai.edge.litert": "litert",
     "org.tensorflow.lite": "litert",
     "androidx.annotation": "androidx.annotation",

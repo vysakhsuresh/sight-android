@@ -9,9 +9,17 @@ Last updated: 12 November 2026.
 
 ## What exists today
 
-**No model exists yet.** The harness (P1, item 9) is built before any model is trained, so there
-is no score to write. The pack is empty, and the app says so: every mode that needs a model falls
-to Light level, by the chain in `docs/FALLBACKS.md`.
+**One borrowed model, interim, and none of ours yet.** At the owner's request on 12 Nov 2026
+("do the complete end to end dev"), Read runs on Tesseract's fast LSTM recognisers (Apache-2.0)
+while our own OCR is built. It is the last tier of Read (`ocr.tesseract`), below ours and their
+twins, so ours take over the day they are in the pack. **It has no harness score yet**, because
+the harness and the Ikshana set (P1) do not exist yet; that is the first number this page owes.
+
+| Model | Tier | Harness score | Measured | Size |
+|---|---|---|---|---|
+| `ocr.tesseract` (mal+eng loaded; hin, tam, kan, tel available) | **borrowed, interim**: not ours, not fine-tuned | none yet (P1) | moto g84, 12 Nov: 350-530 ms a frame at 960 x 1280, LSTM only, on the analysis thread (logged, on a frame with no text) | 20.1 MB for six languages |
+
+Every other mode that needs a model falls to Read now, by the chain in `docs/FALLBACKS.md`.
 
 The pure-arithmetic pieces that do the work of a model in P0 are executed, not scored:
 
@@ -33,6 +41,7 @@ The pure-arithmetic pieces that do the work of a model in P0 are executed, not s
 | `vlm` | Describe, Find, Ask | fine-tuned from open weights (SmolVLM2-class, Apache-2.0) | `vlm.lite`; then Read / Describe | — | — | not built |
 | `vlm.lite` | Describe, Find, Ask | fine-tuned from open weights | Read / Describe | — | — | not built |
 | `translate` | Translate | fine-tuned from open weights (IndicTrans2 distilled, MIT) | `translate.lite`; then Read untranslated | — | — | not built |
+| `ocr.tesseract` | Read | borrowed, interim | Light level | — | 20.1 MB | **in the app** |
 | `translate.lite` | Translate | fine-tuned from open weights | Read untranslated | — | — | not built |
 
 The gate numbers the brief sets, so they are written before anything is measured against them:

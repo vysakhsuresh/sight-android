@@ -43,10 +43,15 @@ object Models {
     const val VLM_LITE = "vlm.lite"
     const val TRANSLATE = "translate"
     const val TRANSLATE_LITE = "translate.lite"
+    /**
+     * Interim and borrowed: Tesseract's fast LSTM recognisers (Apache-2.0), so Read works
+     * before our own OCR is trained. The last tier of Read, below ours and their twins.
+     */
+    const val OCR_TESSERACT = "ocr.tesseract"
 
     val all: List<String> = listOf(
         OCR_DETECTOR, OCR_RECOGNISER, OCR_DETECTOR_LITE, OCR_RECOGNISER_LITE,
-        CURRENCY, VLM, VLM_LITE, TRANSLATE, TRANSLATE_LITE
+        CURRENCY, VLM, VLM_LITE, TRANSLATE, TRANSLATE_LITE, OCR_TESSERACT
     )
 }
 
@@ -66,7 +71,7 @@ object ModeTable {
      * - Read falls to Light, which needs no model; Light falls to Help, which needs no camera.
      */
     val needs: Map<Mode, Needs> = mapOf(
-        Mode.READ to Needs(true, listOf(ocr, ocrLite), Mode.LIGHT),
+        Mode.READ to Needs(true, listOf(ocr, ocrLite, setOf(Models.OCR_TESSERACT)), Mode.LIGHT),
         Mode.MONEY to Needs(true, listOf(setOf(Models.CURRENCY)), Mode.READ),
         Mode.DESCRIBE to Needs(true, listOf(setOf(Models.VLM), setOf(Models.VLM_LITE)), Mode.READ),
         Mode.FIND to Needs(true, listOf(setOf(Models.VLM), setOf(Models.VLM_LITE)), Mode.DESCRIBE),

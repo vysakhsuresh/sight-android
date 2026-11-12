@@ -22,12 +22,15 @@ import java.util.concurrent.atomic.AtomicInteger
  * engine there is nothing left to speak with (docs/FALLBACKS.md says so plainly).
  */
 class Voice(context: Context, private val onUnavailable: (String) -> Unit) {
-    private val pending = ArrayDeque<String>()
+    /** Each line with the language to say it in; null is the phone's own. */
+    private val pending = ArrayDeque<Pair<String, String?>>()
     private var ready = false
     private var failed = false
     private var paused = false
-    private var current: String? = null
+    private var current: Pair<String, String?>? = null
+    private var language: String? = null
     var last: String? = null; private set
+    private var lastTag: String? = null
     private val ids = AtomicInteger()
     private val lock = Any()
 
@@ -38,7 +41,7 @@ class Voice(context: Context, private val onUnavailable: (String) -> Unit) {
                 flush()
             } else {
                 failed = true
-                pending.lastOrNull()?.let(onUnavailable)
+                pending.lastOrNull()?.let { onUnavailable(it.first) }
                 pending.clear()
             }
         }
@@ -57,15 +60,11 @@ class Voice(context: Context, private val onUnavailable: (String) -> Unit) {
         })
     }
 
-    /** Speak in the phone's language; P2 chooses the user's language and the neural voice. */
-    fun setLanguage(locale: Locale) {
-        synchronized(lock) { if (ready) tts.language = locale }
-    }
-
-    fun say(text: String) = synchronized(lock) {
+    fun say(text: String, languageTag: String? = null) = synchronized(lock) {
         last = text
+        lastTag = languageTag
         if (failed) { onUnavailable(text); return@synchronized }
-        pending.addLast(text)
+        pending.addLast(text to languageTag)
         if (ready && !paused && current == null) flush()
     }
 
@@ -75,7 +74,7 @@ class Voice(context: Context, private val onUnavailable: (String) -> Unit) {
         if (failed) { onUnavailable(l); return@synchronized }
         tts.stop()
         current = null
-        pending.addFirst(l)
+        pending.addFirst(l to lastTag)
         paused = false
         if (ready) flush()
     }
@@ -102,8 +101,19 @@ class Voice(context: Context, private val onUnavailable: (String) -> Unit) {
 
     private fun flush() {
         if (paused || current != null) return
-        val text = pending.removeFirstOrNull() ?: return
-        current = text
+        val item = pending.removeFirstOrNull() ?: return
+        current = item
+        val (text, tag) = item
+        if (tag != language) {
+            // A line in a script the engine has no voice for is still said, in the phone's own
+            // voice, rather than dropped: badly read is better than silent (docs/FALLBACKS.md).
+            val r = tts.setLanguage(if (tag == null) Locale.getDefault() else Locale.forLanguageTag(tag))
+            if (r == TextToSpeech.LANG_MISSING_DATA || r == TextToSpeech.LANG_NOT_SUPPORTED) {
+                android.util.Log.w("Ikshana", "no voice for $tag; using the phone's own")
+                tts.setLanguage(Locale.getDefault())
+            }
+            language = tag
+        }
         val r = tts.speak(text, TextToSpeech.QUEUE_ADD, null, "ik-${ids.incrementAndGet()}")
         if (r != TextToSpeech.SUCCESS) { current = null; onUnavailable(text) }
     }

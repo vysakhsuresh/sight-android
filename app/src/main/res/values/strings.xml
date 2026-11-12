@@ -59,5 +59,12 @@
     <string name="settings_earcons">Sounds</string>
     <string name="settings_haptics">Vibration</string>
     <string name="settings_close">Close settings</string>
+    <string name="settings_reading">Reading</string>
+    <string name="read_mal_eng">Malayalam and English</string>
+    <string name="read_hin_eng">Hindi and English</string>
+    <string name="read_tam_eng">Tamil and English</string>
+    <string name="read_kan_eng">Kannada and English</string>
+    <string name="read_tel_eng">Telugu and English</string>
+    <string name="read_eng">English</string>
     <string name="paused">Paused. Tap to resume.</string>
 </resources>

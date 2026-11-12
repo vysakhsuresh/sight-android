@@ -9,6 +9,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.layerbit.ikshana.engine.light.LightBand
 import com.layerbit.ikshana.engine.light.LightLevel
+import com.layerbit.ikshana.camera.CameraDoor
+import com.layerbit.ikshana.engine.mode.Hint
+import com.layerbit.ikshana.engine.read.NothingPacer
+import com.layerbit.ikshana.engine.read.ReadMemory
+import com.layerbit.ikshana.engine.read.ReadText
+import com.layerbit.ikshana.engine.read.Scripts
+import com.layerbit.ikshana.read.Reader
 import com.layerbit.ikshana.engine.mode.CameraState
 import com.layerbit.ikshana.engine.mode.Earcon
 import com.layerbit.ikshana.engine.mode.Effect
@@ -47,6 +54,14 @@ class Session(private val context: Context, val prefs: Prefs) {
         }
     }
     private var band: LightBand? = null
+    /** The mode as the analysis thread sees it; written on main, read there. */
+    @Volatile private var activeNow: Mode = Mode.HELP
+    @Volatile var readLanguages: String = prefs.readLanguages; private set
+    var readLanguagesShown: String by mutableStateOf(prefs.readLanguages); private set
+    private val reader = Reader(context)
+    private val memory = ReadMemory()
+    private val pacer = NothingPacer()
+    private var lastLight = 0L
 
     /** The app opened: the camera's permission is known by now, the last mode is in Prefs. */
     fun start(camera: CameraState, afterCrash: Boolean) {
@@ -64,10 +79,61 @@ class Session(private val context: Context, val prefs: Prefs) {
             // it (DEVICE_FINDINGS says which: logged is not heard). Nothing here leaves the phone.
             is Effect.Say -> Labels.said(context, e.said).let { Log.i("IkshanaSay", it); voice.say(it) }
             is Effect.Sound -> { Log.i("IkshanaSay", "earcon ${e.earcon}"); feedback.play(e.earcon) }
-            is Effect.Run -> if (e.mode != before) band = null
+            is Effect.Run -> if (e.mode != before) { band = null; memory.clear() }
             Effect.OfferCameraDoors -> Unit // the screen shows them whenever the mode is Help
         }
         if (state.wanted.onRow) prefs.lastMode = state.wanted
+        activeNow = state.active
+    }
+
+    /**
+     * A settled camera frame, on the analysis thread. Light level samples it twice a second;
+     * Read runs the recogniser on it, which takes as long as it takes (the camera drops the
+     * frames that arrive meanwhile), and everything it finds passes the engine's rules before
+     * it is said: junk dropped, lines already said skipped, each line in its script's voice.
+     */
+    fun onFrame(f: CameraDoor.Frame) {
+        when (activeNow) {
+            Mode.LIGHT -> {
+                val now = System.currentTimeMillis()
+                if (now - lastLight < 500) return
+                lastLight = now
+                onLuma(LightLevel.meanLuma(f.y, f.width, f.height, f.rowStride))
+            }
+            Mode.READ -> readFrame(f)
+            else -> Unit
+        }
+    }
+
+    private fun readFrame(f: CameraDoor.Frame) {
+        val langs = readLanguages
+        if (!reader.open(langs)) { send(Event.ModelFailed(Models.OCR_TESSERACT)); return }
+        val started = System.currentTimeMillis()
+        val up = ReadText.rotate(f.y, f.width, f.height, f.rowStride, f.rotation)
+        val lines = try { reader.read(up.bytes, up.width, up.height) } catch (e: Throwable) {
+            Log.w("Ikshana", "read failed", e); send(Event.ModelFailed(Models.OCR_TESSERACT)); return
+        }
+        val kept = ReadText.clean(lines)
+        val mean = LightLevel.meanLuma(f.y, f.width, f.height, f.rowStride)
+        Log.i("IkshanaRead", "${up.width}x${up.height} in ${System.currentTimeMillis() - started} ms: ${lines.size} lines, ${kept.size} kept")
+        main.post {
+            if (activeNow != Mode.READ) return@post
+            for (line in memory.fresh(kept)) {
+                Log.i("IkshanaSay", line)
+                voice.say(line, Scripts.localeOf(line))
+            }
+            if (pacer.onRead(System.currentTimeMillis(), kept.isNotEmpty())) {
+                send(Event.NothingFound(if (LightLevel.bandOf(mean) == LightBand.DARK) Hint.TOO_DARK else Hint.NONE))
+            }
+        }
+    }
+
+    /** Settings: the next reading language in Reader.CHOICES. */
+    fun nextReadLanguages() {
+        val c = Reader.CHOICES
+        val next = c[(c.indexOf(readLanguages) + 1).mod(c.size)]
+        readLanguages = next; readLanguagesShown = next; prefs.readLanguages = next
+        memory.clear()
     }
 
     /** Light level: spoken when the band changes, with the hysteresis in LightLevel. */
@@ -97,6 +163,7 @@ class Session(private val context: Context, val prefs: Prefs) {
     fun runsAsItself(mode: Mode): Boolean = ModeMachine.land(state, mode).mode == mode
 
     fun close() {
+        reader.close()
         voice.shutdown()
         feedback.release()
     }
@@ -104,11 +171,13 @@ class Session(private val context: Context, val prefs: Prefs) {
     companion object {
         /**
          * The models this install carries, as assets/models/<id>.tflite (the asset pack and the
-         * full APK both land there, as in Stave's ModelStore). Empty in P0.
+         * full APK both land there, as in Stave's ModelStore), and the interim reader's
+         * language files under assets/tessdata.
          */
         fun shelf(context: Context): Set<String> {
             val files = try { context.assets.list("models")?.toSet().orEmpty() } catch (_: Throwable) { emptySet() }
-            return Models.all.filter { "$it.tflite" in files }.toSet()
+            val packed = Models.all.filter { "$it.tflite" in files }.toSet()
+            return if (Reader.inPack(context)) packed + Models.OCR_TESSERACT else packed
         }
     }
 }

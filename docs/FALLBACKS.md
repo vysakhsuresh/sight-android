@@ -70,3 +70,6 @@ These happen in the app's doors, not in the machine, and are listed here so the 
 | No text-to-speech engine, or its language missing | The sentence is shown in large type, the fallback earcon and its twin play, and `no_voice` is shown saying where to install a voice. **This is the one path where the app cannot speak**, because there is no voice to speak with; the neural voices (P2, Squish's converted Indic voices) remove the dependency on the phone's engine. | built, not seen |
 | The earcon player cannot open an audio track | The sentence still goes to the voice; the haptic twin still plays. | built, not seen |
 | The vibrator is absent | Earcons and speech carry on. | built, not seen |
+| The phone has no voice for a line's script (say, no Malayalam voice installed) | The line is said in the phone's own voice rather than dropped, and the gap is logged. Badly read is better than silent; the neural Indic voices (P2) close it. | built, not seen |
+| The reader cannot open or crashes on a frame | `ModelFailed(ocr.tesseract)`: the machine says Read could not start and lands on Light level. | built, not seen |
+| Read sees no text | Nothing said for 4 s, then `say_too_dark` if the frame is dark or `say_nothing_here`, then no more than every 10 s (`NothingPacer`). | seen in the log on the moto, 12 Nov (dark frame) |

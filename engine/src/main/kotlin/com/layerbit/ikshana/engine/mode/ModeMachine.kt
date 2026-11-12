@@ -79,6 +79,10 @@ object ModeMachine {
 
     fun usable(state: State, model: String) = model in state.shelf && model !in state.failed
 
+    /** The best tier of [mode] whose models are all in the pack, failed or not; -1 if none. */
+    fun bestOnShelf(state: State, mode: Mode): Int =
+        ModeTable.of(mode).tiers.indexOfFirst { t -> t.all { it in state.shelf } }
+
     private fun cameraOk(camera: CameraState) = camera == CameraState.GRANTED || camera == CameraState.PICTURE
 
     /**
@@ -114,7 +118,7 @@ object ModeMachine {
             // After a crash the restart sentence already names the mode, so only Help's own
             // sentence follows it (how to allow the camera is never left unsaid); a fresh start
             // says why the mode is not the one asked for, if it is not.
-            val why = explain(s.wanted, land, failed = false)
+            val why = explain(s, s.wanted, land, failed = false)
             if (why != null && (!event.afterCrash || land.mode == Mode.HELP)) {
                 effects += Effect.Say(why); next = next.copy(lastSaid = why)
             }
@@ -140,7 +144,7 @@ object ModeMachine {
                     event.state == CameraState.BUSY -> Said(Line.CAMERA_BUSY)
                     land.mode == Mode.HELP -> Said(Line.NO_CAMERA)
                     before == Mode.HELP -> Said(Line.CAMERA_BACK, listOf(land.mode))
-                    else -> explain(s.wanted, land, failed = false) ?: Said(Line.MODE_ON, listOf(land.mode))
+                    else -> explain(s, s.wanted, land, failed = false) ?: Said(Line.MODE_ON, listOf(land.mode))
                 }
                 speak(s.copy(active = land.mode, tier = land.tier), said, land, Earcon.FALLBACK)
             }
@@ -173,9 +177,9 @@ object ModeMachine {
         val land = land(state, state.wanted)
         val changed = land.mode != state.active || land.tier != state.tier
         if (!changed && !announceSame) return Step(state, emptyList())
-        val said = explain(state.wanted, land, failed)
+        val said = explain(state, state.wanted, land, failed)
             ?: Said(Line.MODE_ON, listOf(land.mode))
-        val earcon = if (land.mode == state.wanted && land.tier == 0) Earcon.MODE else Earcon.FALLBACK
+        val earcon = if (land.mode == state.wanted && land.tier == bestOnShelf(state, land.mode)) Earcon.MODE else Earcon.FALLBACK
         return speak(state.copy(active = land.mode, tier = land.tier), said, land, earcon)
     }
 
@@ -184,9 +188,11 @@ object ModeMachine {
      * It names what was asked for and where the app landed, which is "what was tried and what to
      * do next" in the fewest words.
      */
-    private fun explain(wanted: Mode, land: Landing, failed: Boolean): Said? = when {
+    private fun explain(state: State, wanted: Mode, land: Landing, failed: Boolean): Said? = when {
         land.mode == Mode.HELP -> Said(Line.NO_CAMERA)
-        land.mode == wanted && land.tier == 0 -> null
+        // "Lighter" only when a better tier is in the pack and could not run here: with only the
+        // interim reader in the pack, Read is Read, not a lighter Read.
+        land.mode == wanted && land.tier == bestOnShelf(state, wanted) -> null
         land.mode == wanted -> Said(Line.LIGHTER, listOf(wanted))
         failed || land.blockedByFailure -> Said(Line.COULD_NOT_START, listOf(wanted, land.mode))
         else -> Said(Line.NOT_READY, listOf(wanted, land.mode))

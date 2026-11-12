@@ -26,3 +26,6 @@ __pycache__/
 /tools/models/**/work/
 /tools/models/**/.venv/
 .claude/worktrees/
+
+# The interim Read models, fetched and checked by tools/models/fetch_tessdata.sh.
+/app/src/main/assets/tessdata/

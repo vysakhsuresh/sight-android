@@ -19,6 +19,11 @@ class Prefs(context: Context) {
         get() = p.getBoolean("earcons", true)
         set(v) { p.edit().putBoolean("earcons", v).apply() }
 
+    /** Tesseract language codes for Read; Malayalam with English first (brief: Indian languages before English). */
+    var readLanguages: String
+        get() = p.getString("read_languages", null) ?: "mal+eng"
+        set(v) { p.edit().putString("read_languages", v).apply() }
+
     var haptics: Boolean
         get() = p.getBoolean("haptics", true)
         set(v) { p.edit().putBoolean("haptics", v).apply() }
