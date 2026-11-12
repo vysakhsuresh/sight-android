@@ -12,6 +12,7 @@ object Registry {
         ReadTextChecks,
         MoneyChecks,
         VoiceChoiceChecks,
+        SeeChecks,
         RunnerChecks
     )
 }

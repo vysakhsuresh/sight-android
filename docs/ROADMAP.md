@@ -104,6 +104,15 @@ Describe, Find, Ask and Translate now say what they will do when chosen (`say_ab
 - [ ] 18. The currency set and CNN. Check: top-1 above 99% held out, every miss listed.
 - [ ] 19. The vision-language model, chosen by the harness, fine-tuned, converted (LiteRT or
   llama.cpp by measurement), checked against the reference run; the OCR/VLM swap designed for 4 GB.
+  **Started 12 Nov.** [~] The rules on either side of the model are built in `engine/see`
+  (`SeeChecks`, each of six faults seen failing): the frame gate (no black or smeared frame is
+  shown to the model, the listener is told why), the cut of a description to two sentences
+  without preambles, Find's box-to-direction (no box, no direction), Ask's ready questions and
+  the prompts. Decided by measurement-to-come rather than taste: llama.cpp is the first runtime
+  tried (a vision model's LiteRT conversion is the long road); three openly licensed candidates
+  of 0.5, 1 and 2 billion parameters are downloaded for the laptop comparison on 60 VizWiz
+  photos (photos taken by blind people, with the question each asked). **Blocked:** running and
+  building llama.cpp on this laptop needs a permission the session does not have yet.
 - [ ] 20. Colour (`ColourChecks` from Still's table). Light is done above.
 - [ ] 21. Money and Describe screens. **Release gate:** a blind tester counts a mixed bundle with
   the display off; describes a kitchen and a street; ten minutes without thermal throttle.
@@ -122,6 +131,10 @@ Describe, Find, Ask and Translate now say what they will do when chosen (`say_ab
 
 - [ ] 24. Questions over the vision model with the seen/thought split; voice input through the
   phone's own speech input. **Release gate:** ten testers' questions.
+  Owner, 12 Nov ("everything is needed"): Ask must take a spoken question even where the phone
+  has no offline speech input, so an own offline recogniser comes with it, and with it
+  RECORD_AUDIO, the first permission beyond CAMERA. Until then the six ready questions in
+  `engine/see` (`Question`) are chosen by tap or swipe.
 
 ## P7 — Polish and release (v1.0)
 

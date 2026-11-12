@@ -103,6 +103,10 @@ must end at Help.
 - **The owner tests on the phone as soon as a build lands and judges by what is spoken.** A mode
   that only says "not ready" reads as broken; every unbuilt mode now says what it will do. The
   owner rejected the almond-eye icon ("no eyelid"); the mark is the beam into a black hole.
+- **The owner wants decisions, not menus.** Decide for the blind user, build it, say what was
+  decided. Stop only for what a permission or the owner's phone and data require.
+- **Running or building code fetched from outside (llama.cpp) is refused by this laptop's
+  session permissions** until the owner allows it; say so plainly, never route around it.
 - **Interim models are allowed when the owner asks for function now**, if labelled borrowed and
   placed as the last tier so ours replace them by score.
 
