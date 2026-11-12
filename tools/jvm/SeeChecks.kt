@@ -31,6 +31,7 @@ object SeeChecks : Suite {
         check(Describe.clean("The image shows a steel tumbler on a kitchen counter.") == "A steel tumbler on a kitchen counter.") { "preamble" }
         check(Describe.clean("In this image, there are two cups on a table") == "Two cups on a table.") { "stacked preambles, full stop added" }
         check(Describe.clean("A bus stop. A red bus on the left. People waiting. A shop behind.") == "A bus stop. A red bus on the left.") { "two sentences" }
+        check(Describe.clean("In front of the camera for a blind person, there is a handrail for support.") == "A handrail for support.") { "the prompt echoed back" }
         check(Describe.clean("I seem to see a door.") == "I seem to see a door.") { "whole words only" }
         check(Describe.clean("   ") == null && Describe.clean("The image shows") == null) { "nothing left is null, not silence dressed as text" }
         val long = (1..80).joinToString(" ") { "word" }

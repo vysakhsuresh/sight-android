@@ -60,7 +60,9 @@ object Describe {
         "the image shows", "the image depicts", "the image features", "the photo shows", "the picture shows",
         "this image shows", "this is an image of", "this is a picture of", "this is a photo of",
         "in this image,", "in the image,", "in this picture,", "i can see", "i see", "the scene shows",
-        "the image is of", "it looks like", "it appears to be", "there is", "there are"
+        "the image is of", "it looks like", "it appears to be", "there is", "there are",
+        // the chosen model's own habit on the VizWiz comparison (12 Nov): it echoes the prompt
+        "in front of the camera for a blind person", "in front of the camera", "the main thing in front of the camera is"
     )
 
     /**
