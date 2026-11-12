@@ -3,6 +3,7 @@ package com.layerbit.ikshana
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -59,8 +60,10 @@ class Session(private val context: Context, val prefs: Prefs) {
         val before = state.active
         state = step.state
         for (e in step.effects) when (e) {
-            is Effect.Say -> voice.say(Labels.said(context, e.said))
-            is Effect.Sound -> feedback.play(e.earcon)
+            // Logged so a phone session can read what was handed to the voice without hearing
+            // it (DEVICE_FINDINGS says which: logged is not heard). Nothing here leaves the phone.
+            is Effect.Say -> Labels.said(context, e.said).let { Log.i("IkshanaSay", it); voice.say(it) }
+            is Effect.Sound -> { Log.i("IkshanaSay", "earcon ${e.earcon}"); feedback.play(e.earcon) }
             is Effect.Run -> if (e.mode != before) band = null
             Effect.OfferCameraDoors -> Unit // the screen shows them whenever the mode is Help
         }
@@ -73,7 +76,7 @@ class Session(private val context: Context, val prefs: Prefs) {
         val next = LightLevel.next(band, mean)
         if (next != band) {
             band = next
-            voice.say(context.getString(Labels.light(next)))
+            context.getString(Labels.light(next)).let { Log.i("IkshanaSay", it); voice.say(it) }
         }
     }
 

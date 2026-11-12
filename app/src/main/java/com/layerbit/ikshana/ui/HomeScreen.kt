@@ -201,7 +201,8 @@ private fun SettingsButton(modifier: Modifier, onClick: () -> Unit) {
         contentAlignment = Alignment.Center
     ) {
         // Three bars, drawn in text so there is no icon library to declare: the name is on the node.
-        Text("≡", style = MaterialTheme.typography.headlineMedium, color = Ink.Text)
+        // Seen in the moto's dump on 12 Nov: without clearing, the glyph was read after the name.
+        Text("≡", Modifier.clearAndSetSemantics { }, style = MaterialTheme.typography.headlineMedium, color = Ink.Text)
     }
 }
 

@@ -1,3 +1,4 @@
+import java.util.Properties
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -8,8 +9,15 @@ plugins {
 
 // Shape and versions from ../stave-android/app/build.gradle.kts (12 Nov 2026). Not yet carried:
 // the play/full flavours and the asset pack (they arrive with the first model, P2), the
-// baseline profile, the native build (app/src/main/cpp arrives with the first native code), and
-// release signing (keystore.properties, as Stave, when there is a release to sign).
+// baseline profile, and the native build (app/src/main/cpp arrives with the first native code).
+// Release signing credentials live only in a local, git-ignored keystore.properties (see
+// keystore.properties.example; release.yml writes one from the secrets) - never in the repo.
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val hasKeystoreProperties = keystorePropertiesFile.exists()
+val keystoreProperties = Properties().apply {
+    if (hasKeystoreProperties) load(keystorePropertiesFile.inputStream())
+}
+
 android {
     namespace = "com.layerbit.ikshana"
     compileSdk = 36
@@ -23,8 +31,20 @@ android {
         versionName = "0.0.1"
     }
 
+    signingConfigs {
+        if (hasKeystoreProperties) {
+            create("release") {
+                storeFile = file(keystoreProperties.getProperty("storeFile"))
+                storePassword = keystoreProperties.getProperty("storePassword")
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
+            if (hasKeystoreProperties) signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")

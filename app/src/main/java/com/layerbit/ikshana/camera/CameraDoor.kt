@@ -37,6 +37,8 @@ class CameraDoor(
     private var provider: ProcessCameraProvider? = null
     /** Light level is spoken twice a second at most; analysing more often only warms the phone. */
     private var lastAnalysis = 0L
+    /** When this binding's first frame arrived; auto-exposure is still moving until SETTLE_MS after it. */
+    private var firstFrame = 0L
 
     fun bind(owner: LifecycleOwner, view: PreviewView) {
         val future = ProcessCameraProvider.getInstance(context)
@@ -56,7 +58,8 @@ class CameraDoor(
                 analysis.setAnalyzer(analysisThread) { image ->
                     try {
                         val now = System.currentTimeMillis()
-                        if (now - lastAnalysis >= 500) {
+                        if (firstFrame == 0L) firstFrame = now
+                        if (now - firstFrame >= LightLevel.SETTLE_MS && now - lastAnalysis >= 500) {
                             lastAnalysis = now
                             val plane = image.planes[0]
                             val buf = plane.buffer
@@ -70,6 +73,7 @@ class CameraDoor(
                     }
                 }
                 p.unbindAll()
+                firstFrame = 0L
                 val camera = p.bindToLifecycle(owner, CameraSelector.DEFAULT_BACK_CAMERA, preview, analysis)
                 camera.cameraInfo.cameraState.observe(owner) { s ->
                     val err = s.error

@@ -48,6 +48,8 @@ fetch coroutines.jar "org/jetbrains/kotlinx/kotlinx-coroutines-core-jvm/1.10.2/k
 # and /c/... unless told. Everything java sees goes through P.
 case "$(uname -s)" in MINGW*|MSYS*|CYGWIN*) SEP=";"; P() { cygpath -m "$1"; } ;; *) SEP=":"; P() { printf %s "$1"; } ;; esac
 KP="$(P "$K")"
+# java from JAVA_HOME when it is set: on the laptop Git Bash has no java on its PATH.
+JAVA="${JAVA_HOME:+$JAVA_HOME/bin/}java"
 COMPILER_CP="$KP/kotlin-compiler-embeddable.jar${SEP}$KP/kotlin-stdlib.jar${SEP}$KP/kotlin-script-runtime.jar${SEP}$KP/kotlin-reflect.jar${SEP}$KP/kotlin-daemon-embeddable.jar${SEP}$KP/trove4j.jar${SEP}$KP/annotations.jar${SEP}$KP/coroutines.jar"
 OUT="${IKSHANA_JVM_OUT:-$ROOT/tools/out}"
 rm -rf "$OUT" && mkdir -p "$OUT"
@@ -61,9 +63,9 @@ fi
 
 echo "compiling engine/ and the suites"
 # The JUnit shim in tools/jvm is for Gradle; here the suites are driven by MainKt.
-java -cp "$COMPILER_CP" org.jetbrains.kotlin.cli.jvm.K2JVMCompiler \
+"$JAVA" -cp "$COMPILER_CP" org.jetbrains.kotlin.cli.jvm.K2JVMCompiler \
   -no-stdlib -nowarn -cp "$KP/kotlin-stdlib.jar" -d "$(P "$OUT")" \
   $(find "$ENGINE" -name '*.kt') $(find "$SUITES" -name '*.kt' ! -name 'EngineSuitesTest.kt') 2>&1 | grep -v JAVA_TOOL_OPTIONS || true
 [ -f "$OUT/MainKt.class" ] || { echo "compile failed"; exit 1; }
 
-(cd "$ROOT" && java -cp "$(P "$OUT")${SEP}$KP/kotlin-stdlib.jar" MainKt "$@") 2>&1 | grep -v JAVA_TOOL_OPTIONS
+(cd "$ROOT" && "$JAVA" -cp "$(P "$OUT")${SEP}$KP/kotlin-stdlib.jar" MainKt "$@") 2>&1 | grep -v JAVA_TOOL_OPTIONS

@@ -1,0 +1,86 @@
+name: Release
+# From ../stave-android/.github/workflows/release.yml (12 Nov 2026). A tag v* builds the release
+# APK after the engine suites, lint and the manifest check. Signing wants the owner's key in the
+# repository secrets (IKSHANA_KEYSTORE_BASE64, IKSHANA_KEYSTORE_PASSWORD, IKSHANA_KEY_ALIAS,
+# IKSHANA_KEY_PASSWORD); without them the job publishes an unsigned build marked as such.
+# The Play bundle with its asset pack and the "full" APK with every model inside join here with
+# the first model (P2).
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'The tag to create and release, e.g. v0.1.0 (made at the dispatched commit)'
+        required: true
+permissions:
+  contents: read
+env:
+  TAG: ${{ github.event.inputs.tag || github.ref_name }}
+jobs:
+  engine:
+    name: Pure engine (no Android SDK)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - run: bash tools/jvm/run.sh
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install Android SDK packages
+        run: '"$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;36.0.0" "platform-tools"'
+      - uses: gradle/actions/setup-gradle@v4
+      # GitHub refuses `secrets` in a step's `if:` (Stave: every push failed in 0 s with it there),
+      # so the key comes in as an env var and the shell decides.
+      - name: Signing key from the secrets, when there is one
+        env:
+          KEYSTORE_B64: ${{ secrets.IKSHANA_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.IKSHANA_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.IKSHANA_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.IKSHANA_KEY_PASSWORD }}
+        run: |
+          if [ -z "$KEYSTORE_B64" ]; then echo "No signing key in the secrets: unsigned build."; exit 0; fi
+          echo "$KEYSTORE_B64" | base64 -d > release.jks
+          printf 'storeFile=%s\nstorePassword=%s\nkeyAlias=%s\nkeyPassword=%s\n' "$PWD/release.jks" "$STORE_PASSWORD" "$KEY_ALIAS" "$KEY_PASSWORD" > keystore.properties
+      - name: Tests, lint, release APK
+        run: ./gradlew :engine:test lintRelease assembleRelease --console plain
+      - name: Verify merged manifests
+        run: python3 tools/verify_manifest.py
+      - name: Name the files for the tag and sum them
+        run: |
+          mkdir -p out
+          for f in app/build/outputs/apk/release/*.apk; do
+            case "$f" in *unsigned*) cp "$f" "out/ikshana-${TAG}-unsigned.apk";; *) cp "$f" "out/ikshana-${TAG}.apk";; esac
+          done
+          (cd out && sha256sum * > SHA256SUMS.txt && cat SHA256SUMS.txt)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-files
+          path: out/
+  publish:
+    needs: [engine, build]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-files
+          path: out
+      - name: Publish the GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$TAG" out/* --target "$GITHUB_SHA" --title "Ikshana $TAG" --notes "Built by release.yml. THIRD_PARTY_NOTICES.md lists every piece and its licence." --prerelease

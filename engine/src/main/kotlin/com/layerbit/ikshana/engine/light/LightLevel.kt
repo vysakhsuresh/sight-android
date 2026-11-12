@@ -24,6 +24,14 @@ object LightLevel {
     const val HYSTERESIS = 6
 
     /**
+     * Frames are not read for this long after the camera's first frame. Seen on the moto on
+     * 12 November: the first analysed frame read "Dark." while auto-exposure was still opening
+     * up, and "Bright light." a second later, in a lit room. A false "dark" is the one reading
+     * this mode must never give, so the camera is given the time to settle first.
+     */
+    const val SETTLE_MS = 1500L
+
+    /**
      * Mean luma over a grid of samples, every [step]th pixel each way. The full plane is 2 MP on
      * the moto; a 1-in-8 grid is 30k samples, enough for a mean to a fraction of a level, and
      * keeps the analysis thread far under a frame.
