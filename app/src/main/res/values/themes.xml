@@ -4,6 +4,8 @@
          into a low-vision user's eyes. -->
     <style name="Theme.Ikshana" parent="android:Theme.Material.NoActionBar">
         <item name="android:windowBackground">@color/ink</item>
+        <!-- As LayerLink: the window's own font is Space Grotesk, so system-drawn text matches. -->
+        <item name="android:fontFamily">@font/space_grotesk</item>
         <item name="android:statusBarColor">@color/ink</item>
         <item name="android:navigationBarColor">@color/ink</item>
     </style>

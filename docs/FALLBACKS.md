@@ -6,7 +6,7 @@ the app knows about, where it lands, and the sentence spoken. It is held to the 
 
 - the chain and the sentences are data in `engine/.../mode/` (`ModeTable`, `Line`, `ModeMachine`);
 - `FallbackChecks` walks every state (every model present, absent or failed; every camera state;
-  hot and cool; every mode the user can want) through every event, about 2.9 million steps, and
+  hot and cool; every mode the user can want) through every event, about 4.7 million steps, and
   fails if any step that changes what the user is in, or answers what the user did, ends without
   a sentence (or, when the sentence would be the one just said, the "repeat" earcon);
 - `SpeechTableChecks` fails if any line below has no string in `values/strings.xml`, a different

@@ -1,0 +1,15 @@
+Ikshana is a camera that answers, on your phone, for people who cannot see well first and everyone second.
+
+It cannot upload what it sees. The app does not ask for the internet permission at all, so nothing the camera sees - your medicines, your money, your home - can leave your phone. You can check that yourself in the permission list on this page: the camera is the only thing it asks for.
+
+It never goes silent. If something it needs is missing or fails, it says so in a sentence, says what still works, and carries on with that.
+
+What works today (version 0.0.1, an early build):
+- Opens on the camera and speaks.
+- Light level: tells you if the room is dark, dim, bright or glaring, for anyone who cannot tell whether the lamp is on.
+- Every result is spoken, with a sound and a vibration for each event, both of which can be switched off.
+- Tap anywhere to pause the voice, swipe down to repeat, swipe left or right to change mode. With TalkBack, the same actions are on the camera view.
+
+What is being built, in this order: Read (text in Malayalam, Hindi, Tamil, Kannada, Telugu and English, with dates, doses and amounts spoken as fields), Money, Describe, Find, Translate and Ask. Each mode says plainly when it is not on your phone yet.
+
+Free, forever. No account, no counter, no ads, no subscription. Open source under the GPL.

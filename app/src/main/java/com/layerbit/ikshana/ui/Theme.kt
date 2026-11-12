@@ -7,11 +7,9 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
@@ -19,7 +17,8 @@ import androidx.compose.ui.unit.sp
 import com.layerbit.ikshana.R
 
 /**
- * Ink with one Iris band (brief, section 4), from Stave's Theme.kt (../stave-android, 12 Nov 2026).
+ * Ink with one Iris band (brief, section 4), palette from Stave's Theme.kt; type as LayerLink
+ * sets it (Space Grotesk for every word, the window's font too), by the owner's choice, 12 Nov.
  *
  * The family base is the cool blue-black the icon sits on; each app spends one saturated colour
  * on the primary action alone. Ikshana's is Iris, the icon's eye blue: the active mode, the
@@ -55,11 +54,12 @@ val SpaceGrotesk = FontFamily(
     Font(R.font.space_grotesk_bold, FontWeight.Bold)
 )
 
-/** Fira Code for every number; the file is variable, and without the axis Android draws its lightest. */
-@OptIn(ExperimentalTextApi::class)
-val FiraCode = FontFamily(
-    Font(R.font.fira_code_variable, FontWeight.Medium, variationSettings = FontVariation.Settings(FontVariation.weight(500)))
-)
+/**
+ * Numbers in the platform monospace with tabular digits, as LayerLink sets them
+ * (../layerlink-android/app/src/main/res/layout/activity_main.xml, `monospace` + `tnum`): the
+ * owner chose LayerLink's type for Ikshana on 12 Nov 2026, and LayerLink carries no Fira Code.
+ */
+val Numerals = TextStyle(fontFamily = FontFamily.Monospace, fontFeatureSettings = "tnum")
 
 // Every paragraph takes its direction from its own first letters (Stave's lesson on RTL phones).
 private val ByContent = TextDirection.Content

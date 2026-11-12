@@ -1,0 +1,1 @@
+First build: the camera home, the six modes with their fallbacks, light level, and the voice.

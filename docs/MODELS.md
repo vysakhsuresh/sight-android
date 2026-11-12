@@ -1,0 +1,41 @@
+# Models
+
+Every model that ever runs in the app, ours or borrowed, with its tier, its score from the
+harness, its size, and what runs when a phone cannot carry it. **Every claim about a model is a
+number on this page**; nothing is judged by eye or by ear. A model is not trusted on the phone
+until its conversion is checked against the reference run on an input the conversion never saw.
+
+Last updated: 12 November 2026.
+
+## What exists today
+
+**No model exists yet.** The harness (P1, item 9) is built before any model is trained, so there
+is no score to write. The pack is empty, and the app says so: every mode that needs a model falls
+to Light level, by the chain in `docs/FALLBACKS.md`.
+
+The pure-arithmetic pieces that do the work of a model in P0 are executed, not scored:
+
+| Piece | Tier | How it is checked | Number |
+|---|---|---|---|
+| Light level (`LightLevel`) | fully ours | `LightChecks`: means on known planes, band edges, hysteresis | exact on the fixtures; band edges are P0 values, to be set from the Ikshana set (P1) |
+
+## The ids the app knows
+
+`engine/.../mode/Modes.kt` (`Models`) names these; the app looks for `assets/models/<id>.tflite`.
+
+| Id | Mode(s) | Tier (planned) | Lighter twin or fallback | Harness score | Size | Status |
+|---|---|---|---|---|---|---|
+| `ocr.detector` | Read, Translate | trained by us on open data (DBNet-class, ~15M) | `ocr.detector.lite`; then Light level | — | — | not built |
+| `ocr.recogniser` | Read, Translate | trained by us on open data (CTC, ~10M, a head per script) | `ocr.recogniser.lite`; then Light level | — | — | not built |
+| `ocr.detector.lite` | Read, Translate | trained by us on open data | Light level | — | — | not built |
+| `ocr.recogniser.lite` | Read, Translate | trained by us on open data | Light level | — | — | not built |
+| `currency` | Money | fully ours (small CNN on photos we take) | Read (the numerals on the note) | — | — | not built |
+| `vlm` | Describe, Find, Ask | fine-tuned from open weights (SmolVLM2-class, Apache-2.0) | `vlm.lite`; then Read / Describe | — | — | not built |
+| `vlm.lite` | Describe, Find, Ask | fine-tuned from open weights | Read / Describe | — | — | not built |
+| `translate` | Translate | fine-tuned from open weights (IndicTrans2 distilled, MIT) | `translate.lite`; then Read untranslated | — | — | not built |
+| `translate.lite` | Translate | fine-tuned from open weights | Read untranslated | — | — | not built |
+
+The gate numbers the brief sets, so they are written before anything is measured against them:
+Malayalam CER under 8% on the clean two thirds of the set before v0.1; currency top-1 above 99%
+held out; Describe under five seconds on the moto; translation BLEU against the reference run
+within a stated margin.
