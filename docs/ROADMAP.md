@@ -111,8 +111,12 @@ Describe, Find, Ask and Translate now say what they will do when chosen (`say_ab
   the prompts. Decided by measurement-to-come rather than taste: llama.cpp is the first runtime
   tried (a vision model's LiteRT conversion is the long road); three openly licensed candidates
   of 0.5, 1 and 2 billion parameters are downloaded for the laptop comparison on 60 VizWiz
-  photos (photos taken by blind people, with the question each asked). **Blocked:** running and
-  building llama.cpp on this laptop needs a permission the session does not have yet.
+  photos (photos taken by blind people, with the question each asked). [~] Describe is wired end
+  to end: llama.cpp b12319 as a submodule built into `libikshana_vision.so` (arm64), the JNI
+  bridge (`app/src/main/cpp/vision.cpp`), `VisionModel`, colour frames from `CameraDoor` only
+  while Describe runs, `DescribePacer` (speaks again only when the scene changes), "Looking."
+  once on entering. The model is found in the app's external files `models/vision/` (pushed by
+  adb for now; the asset pack and "full" APK later). Built; **not seen on the phone**.
 - [ ] 20. Colour (`ColourChecks` from Still's table). Light is done above.
 - [ ] 21. Money and Describe screens. **Release gate:** a blind tester counts a mixed bundle with
   the display off; describes a kitchen and a street; ten minutes without thermal throttle.

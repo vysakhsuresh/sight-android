@@ -55,7 +55,7 @@ class MainActivity : ComponentActivity() {
         val prefs = Prefs(this)
         crashed = prefs.takeCrash()
         session = Session(applicationContext, prefs)
-        camera = CameraDoor(applicationContext, { session.send(Event.Camera(it)) }, { session.onFrame(it) })
+        camera = CameraDoor(applicationContext, { session.send(Event.Camera(it)) }, { session.wantsColour }, { session.onFrame(it) })
 
         setContent {
             IkshanaTheme {

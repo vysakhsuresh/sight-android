@@ -33,6 +33,9 @@ enum class Line(val id: String, val modes: Int, val english: String) {
     WARM("warm", 0, "The phone is warm. Ikshana is slowing down to cool it."),
     COOL("cool", 0, "The phone has cooled. Back to full speed."),
     TOO_LONG("too_long", 1, "%1\$s is taking too long. Hold still and try again."),
+    // Said when Describe starts looking: the model takes seconds, and seconds of nothing after
+    // choosing a mode is the silence the owner's second rule forbids.
+    LOOKING("looking", 0, "Looking."),
     // What each mode does, said after "not ready yet" so nobody is left guessing what a
     // button is for (owner, 12 Nov: "if I cannot understand what Translate translates, how
     // will a visually impaired man?").

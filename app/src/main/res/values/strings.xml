@@ -34,6 +34,7 @@
     <string name="say_warm">The phone is warm. Ikshana is slowing down to cool it.</string>
     <string name="say_cool">The phone has cooled. Back to full speed.</string>
     <string name="say_too_long">%1$s is taking too long. Hold still and try again.</string>
+    <string name="say_looking">Looking.</string>
 
     <string name="say_about_read">Read speaks any text the camera sees: signs, pages, medicine strips.</string>
     <string name="say_about_money">Money tells you the value of an Indian note. Hold the note flat, a hand\'s length away.</string>

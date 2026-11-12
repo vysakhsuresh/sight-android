@@ -61,6 +61,7 @@ plays with it.
 | `say_warm` | the phone crossed the thermal throttle line; the frame rate drops | nothing | The phone is warm. Ikshana is slowing down to cool it. |
 | `say_cool` | it came back under | nothing | The phone has cooled. Back to full speed. |
 | `say_too_long` | the mode's answer missed its time budget | nothing | %1$s is taking too long. Hold still and try again. |
+| `say_looking` | Describe has sent a frame to the vision model and the answer takes seconds | nothing | Looking. |
 
 When a sentence would be exactly the one just spoken, it is not said again (brief, section 4):
 the **repeat** earcon (two quick ticks) and its twin answer instead, so the user still hears the

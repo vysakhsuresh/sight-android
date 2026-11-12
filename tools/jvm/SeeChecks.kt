@@ -1,4 +1,5 @@
 import com.layerbit.ikshana.engine.see.Describe
+import com.layerbit.ikshana.engine.see.DescribePacer
 import com.layerbit.ikshana.engine.see.Find
 import com.layerbit.ikshana.engine.see.FrameGate
 import com.layerbit.ikshana.engine.see.Gate
@@ -34,6 +35,18 @@ object SeeChecks : Suite {
         check(Describe.clean("   ") == null && Describe.clean("The image shows") == null) { "nothing left is null, not silence dressed as text" }
         val long = (1..80).joinToString(" ") { "word" }
         check(Describe.clean(long)!!.split(' ').size == Describe.MAX_WORDS) { "word cap" }
+
+        section("Describe speaks again only when the scene changes")
+        val wall = DescribePacer.thumb(plane(w, h) { _, _ -> 120 }, w, h)
+        val door = DescribePacer.thumb(plane(w, h) { x, _ -> if (x < w / 2) 30 else 200 }, w, h)
+        val p = DescribePacer()
+        check(p.due(0, wall)) { "the first frame is described" }
+        p.described(0, wall)
+        check(!p.due(DescribePacer.MIN_GAP_MS + 1, wall)) { "the same wall is not described again" }
+        check(!p.due(1_000, door)) { "a new scene inside the gap waits" }
+        check(p.due(DescribePacer.MIN_GAP_MS + 1, door)) { "a new scene after the gap is described" }
+        p.clear()
+        check(p.due(1, wall)) { "after leaving the mode, the first frame again" }
 
         section("Find: a box becomes a direction, and nothing else does")
         check(Find.parseBox("[100, 200, 300, 400]")!!.contentEquals(doubleArrayOf(.1, .2, .3, .4))) { "parse" }

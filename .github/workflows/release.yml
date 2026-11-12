@@ -24,6 +24,8 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: true
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -34,6 +36,8 @@ jobs:
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: true
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -78,6 +82,8 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: true
       - uses: actions/download-artifact@v4
         with:
           name: release-files

@@ -17,6 +17,7 @@ Last updated: 12 November 2026.
 | CameraX 1.4.2 (core, camera2, lifecycle, view) | Apache-2.0 | `:app` | 12 Nov 2026 |
 | Tesseract OCR 5 (via tesseract4android 4.9.0, Robert Pösel) | Apache-2.0 | `:app`, from JitPack, filtered to its one group | 12 Nov 2026 |
 | Leptonica (inside tesseract4android) | BSD-2-Clause | `:app` | 12 Nov 2026 |
+| llama.cpp and ggml (build b12319, commit f3d7725a), the ggml authors; with the libraries it vendors into its multimodal library (stb_image, miniaudio, sheredom's subprocess.h, a hash library), each under its own notice in `third_party/llama.cpp/licenses` and `vendor/` | MIT (vendored pieces: MIT or public domain / MIT-0, per their headers) | `third_party/llama.cpp` (git submodule), built into `libikshana_vision.so` by `app/src/main/cpp` | 12 Nov 2026 |
 | Space Grotesk, Florian Karsten | SIL Open Font License 1.1 | `app/src/main/res/font/space_grotesk_*.ttf` (copied from Stave) | 12 Nov 2026 |
 
 LiteRT 1.4.0 (Apache-2.0) is named in the version catalogue and is **not yet a dependency**; it
@@ -29,6 +30,13 @@ joins `:app` with the first model (P2) and gets its row here that day.
 | Kotlin compiler (embeddable) 2.2.21, kotlinx-coroutines, trove4j, JetBrains annotations | Apache-2.0 (trove4j LGPL-2.1, fetched at build time, never shipped) | `tools/jvm/run.sh`, `jc.sh` |
 | JUnit 4.13.2 | EPL-1.0 | `:engine` tests |
 | Android Gradle Plugin 8.13.2, Gradle 8.13 | Apache-2.0 | build |
+
+## Evaluation only (never trained on, never shipped)
+
+| Piece | Licence | Where |
+|---|---|---|
+| VizWiz validation photos and questions (vizwiz.org), 60 photos taken by blind people, through a Hugging Face mirror | CC BY 4.0 as stated by vizwiz.org; **not yet pinned to that page** | outside the repository (`~/.ikshana-build/vizwiz`) |
+| Three openly licensed candidate vision models in GGUF form (0.5B, 1B and 2B parameters; Apache-2.0 per their model cards) | Apache-2.0 | outside the repository (`~/.ikshana-build/models`); the one chosen gets a row above the day it ships |
 
 ## Copied from the family
 

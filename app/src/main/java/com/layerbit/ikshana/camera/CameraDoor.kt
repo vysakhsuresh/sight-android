@@ -33,10 +33,17 @@ import java.util.concurrent.Executors
 class CameraDoor(
     private val context: Context,
     private val onCamera: (CameraState) -> Unit,
+    /** Whether the mode now running needs colour (the vision model does; the reader and the
+     *  light level do not, and converting every frame would cost the phone for nothing). */
+    private val wantsColour: () -> Boolean = { false },
     private val onFrame: (Frame) -> Unit
 ) {
-    /** One settled luma plane, as the sensor gives it (not yet rotated upright). */
-    class Frame(val y: ByteArray, val width: Int, val height: Int, val rowStride: Int, val rotation: Int)
+    /** One settled luma plane, as the sensor gives it (not yet rotated upright), and when asked
+     *  for, the same frame upright in colour at most [COLOUR_SIDE] on its long side. */
+    class Frame(val y: ByteArray, val width: Int, val height: Int, val rowStride: Int, val rotation: Int, val colour: Rgb? = null)
+
+    /** Tightly packed RGB, three bytes a pixel, upright. */
+    class Rgb(val bytes: ByteArray, val width: Int, val height: Int)
 
     private val analysisThread = Executors.newSingleThreadExecutor()
     private var provider: ProcessCameraProvider? = null
@@ -68,7 +75,8 @@ class CameraDoor(
                             val bytes = ByteArray(buf.remaining())
                             buf.get(bytes)
                             // pixelStride is 1 for the Y plane of YUV_420_888 by the format's definition.
-                            onFrame(Frame(bytes, image.width, image.height, plane.rowStride, image.imageInfo.rotationDegrees))
+                            val colour = if (wantsColour()) rgbOf(image) else null
+                            onFrame(Frame(bytes, image.width, image.height, plane.rowStride, image.imageInfo.rotationDegrees, colour))
                         }
                     } finally {
                         image.close()
@@ -94,6 +102,31 @@ class CameraDoor(
         }, ContextCompat.getMainExecutor(context))
     }
 
+    /** The frame upright, in colour, scaled so its long side is at most COLOUR_SIDE. Null if the
+     *  conversion fails (logged): the mode then treats it as a frame it could not see. */
+    private fun rgbOf(image: androidx.camera.core.ImageProxy): Rgb? = try {
+        val src = image.toBitmap()
+        val scale = minOf(1f, COLOUR_SIDE.toFloat() / maxOf(src.width, src.height))
+        val m = android.graphics.Matrix().apply {
+            postScale(scale, scale)
+            postRotate(image.imageInfo.rotationDegrees.toFloat())
+        }
+        val up = android.graphics.Bitmap.createBitmap(src, 0, 0, src.width, src.height, m, true)
+        val px = IntArray(up.width * up.height)
+        up.getPixels(px, 0, up.width, 0, 0, up.width, up.height)
+        val out = ByteArray(px.size * 3)
+        for (i in px.indices) {
+            val p = px[i]
+            out[3 * i] = (p shr 16).toByte(); out[3 * i + 1] = (p shr 8).toByte(); out[3 * i + 2] = p.toByte()
+        }
+        val rgb = Rgb(out, up.width, up.height)
+        if (up !== src) up.recycle()
+        src.recycle()
+        rgb
+    } catch (t: Throwable) {
+        Log.w("Ikshana", "colour frame failed", t); null
+    }
+
     fun unbind() {
         provider?.unbindAll()
     }
@@ -101,5 +134,10 @@ class CameraDoor(
     fun close() {
         unbind()
         analysisThread.shutdown()
+    }
+
+    companion object {
+        /** The vision models resize to about this anyway; sending more only costs time. */
+        const val COLOUR_SIDE = 768
     }
 }

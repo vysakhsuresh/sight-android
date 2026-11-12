@@ -8,8 +8,8 @@ plugins {
 }
 
 // Shape and versions from ../stave-android/app/build.gradle.kts (12 Nov 2026). Not yet carried:
-// the play/full flavours and the asset pack (they arrive with the first model, P2), the
-// baseline profile, and the native build (app/src/main/cpp arrives with the first native code).
+// the play/full flavours and the asset pack (they arrive with the first model, P2) and the
+// baseline profile. The native build is the vision bridge (app/src/main/cpp) over llama.cpp.
 // Release signing credentials live only in a local, git-ignored keystore.properties (see
 // keystore.properties.example; release.yml writes one from the secrets) - never in the repo.
 val keystorePropertiesFile = rootProject.file("keystore.properties")
@@ -29,6 +29,17 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "0.0.1"
+        // arm64 only: every phone that can hold the vision model in memory is arm64, and each
+        // extra ABI is another full copy of the native library in the APK.
+        ndk { abiFilters += listOf("arm64-v8a") }
+    }
+
+    ndkVersion = "27.2.12479018"
+    externalNativeBuild {
+        cmake {
+            path = file("src/main/cpp/CMakeLists.txt")
+            version = "3.22.1"
+        }
     }
 
     signingConfigs {
@@ -64,7 +75,7 @@ android {
     androidResources {
         generateLocaleConfig = true
         // Memory-mapped by the model runners from P2, which a compressed asset cannot be.
-        noCompress += listOf("tflite", "bin", "traineddata")
+        noCompress += listOf("tflite", "bin", "traineddata", "gguf")
     }
 
     // Every language rides in every install, as Stave: the app chooses its own language, and a

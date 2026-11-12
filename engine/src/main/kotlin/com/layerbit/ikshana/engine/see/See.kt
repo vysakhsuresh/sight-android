@@ -90,6 +90,54 @@ object Describe {
     }
 }
 
+/**
+ * When Describe speaks again. Every frame would be a voice that never stops and a phone that
+ * burns; once would leave the listener who turned round in silence. So: the first settled frame,
+ * then again only when the scene has changed (a coarse grid of mean brightness moved by
+ * [CHANGE] on average) and at least [MIN_GAP_MS] after the last description began.
+ */
+class DescribePacer {
+    private var last: IntArray? = null
+    private var lastAt = -1L
+
+    fun due(nowMs: Long, thumb: IntArray): Boolean {
+        val l = last ?: return true
+        if (nowMs - lastAt < MIN_GAP_MS) return false
+        return difference(l, thumb) >= CHANGE
+    }
+
+    fun described(nowMs: Long, thumb: IntArray) { last = thumb; lastAt = nowMs }
+
+    fun clear() { last = null; lastAt = -1L }
+
+    companion object {
+        const val MIN_GAP_MS = 6_000L
+        /** Mean change per grid cell (0..255) that counts as a new scene. Interim: a hand
+         *  passing is about 10, turning to face another wall 30 or more. Set on the phone. */
+        const val CHANGE = 18.0
+        const val GRID_W = 16
+        const val GRID_H = 12
+
+        /** The mean of each of GRID_W x GRID_H cells of a tight luma plane. */
+        fun thumb(y: ByteArray, width: Int, height: Int): IntArray {
+            val sums = LongArray(GRID_W * GRID_H); val counts = IntArray(GRID_W * GRID_H)
+            var r = 0
+            while (r < height) {
+                var c = 0
+                while (c < width) {
+                    val cell = (r * GRID_H / height) * GRID_W + (c * GRID_W / width)
+                    sums[cell] += (y[r * width + c].toInt() and 0xFF).toLong(); counts[cell]++
+                    c += 4
+                }
+                r += 4
+            }
+            return IntArray(sums.size) { if (counts[it] == 0) 0 else (sums[it] / counts[it]).toInt() }
+        }
+
+        fun difference(a: IntArray, b: IntArray): Double = a.indices.sumOf { abs(a[it] - b[it]) }.toDouble() / a.size
+    }
+}
+
 /** Where a found thing is, as the listener's body knows it. */
 data class Place(val side: Side, val near: Boolean)
 enum class Side { LEFT, AHEAD, RIGHT }

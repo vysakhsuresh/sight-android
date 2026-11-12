@@ -18,6 +18,14 @@ import com.layerbit.ikshana.engine.read.ReadMemory
 import com.layerbit.ikshana.engine.read.ReadText
 import com.layerbit.ikshana.engine.read.Scripts
 import com.layerbit.ikshana.read.Reader
+import com.layerbit.ikshana.see.VisionModel
+import com.layerbit.ikshana.engine.see.Describe
+import com.layerbit.ikshana.engine.see.DescribePacer
+import com.layerbit.ikshana.engine.see.FrameGate
+import com.layerbit.ikshana.engine.see.Gate
+import com.layerbit.ikshana.engine.see.Prompts
+import com.layerbit.ikshana.engine.mode.Line
+import com.layerbit.ikshana.engine.mode.Said
 import com.layerbit.ikshana.engine.mode.CameraState
 import com.layerbit.ikshana.engine.mode.Earcon
 import com.layerbit.ikshana.engine.mode.Effect
@@ -68,6 +76,17 @@ class Session(private val context: Context, val prefs: Prefs) {
     private val memory = ReadMemory()
     private val pacer = NothingPacer()
     private var lastLight = 0L
+    /** The vision model, opened on the analysis thread the first time Describe needs it
+     *  (seconds, and most of a gigabyte), then kept: reopening per mode switch would make
+     *  every return to Describe as slow as the first. */
+    private var vision: VisionModel? = null
+    private val describePacer = DescribePacer()
+    /** Whether "Looking." has been said since Describe was entered: once is reassurance,
+     *  before every description it would be noise. */
+    @Volatile private var lookedSinceEnter = false
+
+    /** Read by the camera's thread: colour frames only while Describe runs. */
+    val wantsColour: Boolean get() = activeNow == Mode.DESCRIBE
 
     /** The app opened: the camera's permission is known by now, the last mode is in Prefs. */
     fun start(camera: CameraState, afterCrash: Boolean) {
@@ -85,7 +104,9 @@ class Session(private val context: Context, val prefs: Prefs) {
             // it (DEVICE_FINDINGS says which: logged is not heard). Nothing here leaves the phone.
             is Effect.Say -> Labels.said(context, e.said).let { Log.i("IkshanaSay", it); voice.say(it) }
             is Effect.Sound -> { Log.i("IkshanaSay", "earcon ${e.earcon}"); feedback.play(e.earcon) }
-            is Effect.Run -> if (e.mode != before) { band = null; memory.clear(); vote.clear() }
+            is Effect.Run -> if (e.mode != before) {
+                band = null; memory.clear(); vote.clear(); describePacer.clear(); lookedSinceEnter = false
+            }
             Effect.OfferCameraDoors -> Unit // the screen shows them whenever the mode is Help
         }
         if (state.wanted.onRow) prefs.lastMode = state.wanted
@@ -108,6 +129,7 @@ class Session(private val context: Context, val prefs: Prefs) {
             }
             Mode.READ -> readFrame(f)
             Mode.MONEY -> moneyFrame(f)
+            Mode.DESCRIBE -> describeFrame(f)
             else -> Unit
         }
     }
@@ -159,6 +181,51 @@ class Session(private val context: Context, val prefs: Prefs) {
         }
     }
 
+    /**
+     * Describe: a frame the scene has changed enough to describe (DescribePacer), that the gate
+     * lets through (no black or smeared frame reaches the model, FrameGate), is described by the
+     * vision model and cut to two plain sentences (Describe.clean) before it is spoken.
+     */
+    private fun describeFrame(f: CameraDoor.Frame) {
+        val rgb = f.colour ?: return
+        val now = System.currentTimeMillis()
+        val tight = ReadText.rotate(f.y, f.width, f.height, f.rowStride, 0)
+        val thumb = DescribePacer.thumb(tight.bytes, tight.width, tight.height)
+        if (!describePacer.due(now, thumb)) return
+        when (FrameGate.check(tight.bytes, tight.width, tight.height)) {
+            Gate.TOO_DARK -> {
+                describePacer.described(now, thumb)
+                send(Event.NothingFound(Hint.TOO_DARK)); return
+            }
+            // Not marked described: the next sharp frame of the same scene should go through.
+            Gate.BLURRED -> {
+                main.post { if (activeNow == Mode.DESCRIBE && pacer.onRead(now, false)) send(Event.NothingFound(Hint.BLURRED)) }
+                return
+            }
+            Gate.OK -> Unit
+        }
+        describePacer.described(now, thumb)
+        if (!lookedSinceEnter) {
+            lookedSinceEnter = true
+            main.post { if (activeNow == Mode.DESCRIBE) Labels.said(context, Said(Line.LOOKING)).let { Log.i("IkshanaSay", it); voice.say(it) } }
+        }
+        val model = vision ?: VisionModel.open(VisionModel.folder(context), THREADS)?.also { vision = it }
+        if (model == null) { send(Event.ModelFailed(Models.VLM)); return }
+        val started = System.currentTimeMillis()
+        val raw = try { model.ask(rgb.bytes, rgb.width, rgb.height, Prompts.DESCRIBE, 64) } catch (e: Throwable) {
+            Log.w("Ikshana", "describe failed", e); null
+        }
+        val text = raw?.let { Describe.clean(it) }
+        Log.i("IkshanaDescribe", "${rgb.width}x${rgb.height} in ${System.currentTimeMillis() - started} ms: $raw")
+        main.post {
+            if (activeNow != Mode.DESCRIBE) return@post
+            pacer.onRead(System.currentTimeMillis(), text != null)
+            if (raw == null) send(Event.ModelFailed(Models.VLM))
+            else if (text == null) send(Event.NothingFound(Hint.NONE))
+            else { Log.i("IkshanaSay", text); voice.say(text, "en-IN") }
+        }
+    }
+
     /** Settings: the next reading language in Reader.CHOICES. */
     fun nextReadLanguages() {
         val c = Reader.CHOICES
@@ -196,11 +263,16 @@ class Session(private val context: Context, val prefs: Prefs) {
     fun close() {
         reader.close()
         moneyReader.close()
+        vision?.close()
         voice.shutdown()
         feedback.release()
     }
 
     companion object {
+        /** The moto's two big cores and two of its small: more threads than big cores slows the
+         *  matrix work down on a phone, measured in Stave's runners. To be measured here. */
+        const val THREADS = 4
+
         /**
          * The models this install carries, as assets/models/<id>.tflite (the asset pack and the
          * full APK both land there, as in Stave's ModelStore), and the interim reader's
@@ -208,7 +280,8 @@ class Session(private val context: Context, val prefs: Prefs) {
          */
         fun shelf(context: Context): Set<String> {
             val files = try { context.assets.list("models")?.toSet().orEmpty() } catch (_: Throwable) { emptySet() }
-            val packed = Models.all.filter { "$it.tflite" in files }.toSet()
+            val packed = Models.all.filter { "$it.tflite" in files }.toSet() +
+                (if (VisionModel.files(VisionModel.folder(context)) != null) setOf(Models.VLM) else emptySet())
             return if (Reader.inPack(context)) packed + Models.OCR_TESSERACT else packed
         }
     }

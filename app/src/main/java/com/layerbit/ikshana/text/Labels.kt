@@ -42,6 +42,7 @@ object Labels {
         Line.WARM -> R.string.say_warm
         Line.COOL -> R.string.say_cool
         Line.TOO_LONG -> R.string.say_too_long
+        Line.LOOKING -> R.string.say_looking
         Line.ABOUT_READ -> R.string.say_about_read
         Line.ABOUT_MONEY -> R.string.say_about_money
         Line.ABOUT_DESCRIBE -> R.string.say_about_describe
