@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!--
+      The family's line (Still, Sheaf, Deja, Stave): no INTERNET permission, so the process cannot
+      open a socket and nothing the camera sees can leave the phone, even if a dependency tried.
+      Anyone can verify it on the Play listing without trusting a policy document. For a camera
+      pointed at a person's prescriptions, their money and their home, that is the product.
+
+      Libraries declare permissions of their own and the merger unions them in, so these lines
+      remove network access whatever any current or future dependency asks for. Never resolve a
+      merger conflict by deleting them. tools/verify_manifest.py checks every merged manifest
+      in CI: CAMERA required; network, storage, location, contacts and microphone forbidden.
+
+      CAMERA is the one permission the app asks for. Pictures come in through the system photo
+      picker, which needs no permission. VIBRATE is a normal permission (granted at install,
+      never asked) for the haptic twin of every earcon.
+    -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.INTERNET" tools:node="remove" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" tools:node="remove" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" tools:node="remove" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" tools:node="remove" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" tools:node="remove" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" tools:node="remove" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" tools:node="remove" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:node="remove" />
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" tools:node="remove" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" tools:node="remove" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" tools:node="remove" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" tools:node="remove" />
+    <!-- Stave saw the merger imply this for an AAR with no targetSdkVersion (1 Nov 2026). -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" tools:node="remove" />
+
+    <!-- A phone with no usable camera can still install it: Help and the gallery door work there. -->
+    <uses-feature android:name="android.hardware.camera.any" android:required="false" />
+
+    <!-- Lets the phone's text-to-speech engine bind on Android 11+; nothing else is queried. -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.TTS_SERVICE" />
+        </intent>
+    </queries>
+
+    <application
+        android:name=".IkshanaApplication"
+        android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="false"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Ikshana"
+        android:enableOnBackInvokedCallback="true">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Compose brings Emoji2, whose initializer can ask an external font provider for
+             downloads. Removed, and never initialised by hand. tools/verify_manifest.py fails if
+             it is ever merged back (it was, for one build on 12 Nov 2026, when this block was
+             taken out to quiet lint's MissingClass: the fix was to declare androidx.startup). -->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data android:name="androidx.emoji2.text.EmojiCompatInitializer" tools:node="remove" />
+        </provider>
+    </application>
+</manifest>

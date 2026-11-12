@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">Ikshana</string>
+
+    <!-- The modes, by the engine's ids (Mode.id). The row's six, then the two floors. -->
+    <string name="mode_read">Read</string>
+    <string name="mode_money">Money</string>
+    <string name="mode_describe">Describe</string>
+    <string name="mode_find">Find</string>
+    <string name="mode_translate">Translate</string>
+    <string name="mode_ask">Ask</string>
+    <string name="mode_light">Light level</string>
+    <string name="mode_help">Help</string>
+
+    <!--
+      What the mode machine says, by the engine's ids (Line.id). The English must equal the
+      engine's reference wording, and docs/FALLBACKS.md must list every one: SpeechTableChecks
+      holds the three together. Each %n$s is a mode's name from the list above.
+    -->
+    <string name="say_welcome">Ikshana.</string>
+    <string name="say_mode_on">%1$s.</string>
+    <string name="say_not_ready">%1$s is not on this phone yet. %2$s is on instead.</string>
+    <string name="say_could_not_start">%1$s could not start. %2$s is on instead.</string>
+    <string name="say_lighter">%1$s is on, with the lighter model this phone can carry.</string>
+    <string name="say_no_camera">Ikshana cannot use the camera. To allow it, open Settings, then Apps, Ikshana, Permissions, Camera. Or pick a picture from the gallery.</string>
+    <string name="say_camera_busy">Another app is using the camera. Close it, and Ikshana will look again.</string>
+    <string name="say_camera_back">The camera is back. %1$s is on.</string>
+    <string name="say_too_dark">Nothing found. It is too dark; more light, please.</string>
+    <string name="say_hold_still">Nothing found. Hold still.</string>
+    <string name="say_move_closer">Nothing found. Move closer.</string>
+    <string name="say_move_back">Nothing found. Move back a little.</string>
+    <string name="say_nothing_here">Nothing found here. Move the phone slowly.</string>
+    <string name="say_restarted">Ikshana restarted. %1$s is on. Say it again.</string>
+    <string name="say_warm">The phone is warm. Ikshana is slowing down to cool it.</string>
+    <string name="say_cool">The phone has cooled. Back to full speed.</string>
+    <string name="say_too_long">%1$s is taking too long. Hold still and try again.</string>
+
+    <!-- Light level, by LightBand.id: spoken when the band changes. -->
+    <string name="light_dark">Dark.</string>
+    <string name="light_dim">Dim light.</string>
+    <string name="light_bright">Bright light.</string>
+    <string name="light_glare">Very bright. Glare.</string>
+
+    <!-- The voice itself is missing: shown, buzzed and sounded, because it cannot be said. -->
+    <string name="no_voice">This phone has no voice for speech. Install one in Settings, System, Languages, Text-to-speech.</string>
+
+    <!-- Controls: every one has a name and a state (brief, section 4). -->
+    <string name="camera_view">Camera. %1$s is on.</string>
+    <string name="mode_state_on">On</string>
+    <string name="mode_state_off">Off</string>
+    <string name="mode_state_not_here">Not on this phone yet</string>
+    <string name="action_repeat">Repeat</string>
+    <string name="action_pause">Pause or resume speech</string>
+    <string name="action_next_mode">Next mode</string>
+    <string name="action_previous_mode">Previous mode</string>
+    <string name="door_allow_camera">Allow the camera</string>
+    <string name="door_pick_picture">Pick a picture</string>
+    <string name="settings">Settings</string>
+    <string name="settings_earcons">Sounds</string>
+    <string name="settings_haptics">Vibration</string>
+    <string name="settings_close">Close settings</string>
+    <string name="paused">Paused. Tap to resume.</string>
+</resources>
