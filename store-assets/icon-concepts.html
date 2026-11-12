@@ -1,96 +1,122 @@
 <!doctype html><html><head><meta charset="utf-8"><title>Ikshana icon concepts</title>
 <style>
-body{margin:0;background:#070A12;color:#F6F7FB;font-family:Inter,system-ui,sans-serif;padding:36px 44px;width:1900px}
-h1{font-size:34px;margin:0 0 8px;font-weight:700}
-.sub{color:#A8B3C9;font-size:19px;margin-bottom:28px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:36px}
-.card{background:#0E1424;border:1px solid #1F2940;border-radius:22px;padding:28px 30px}
-.card h2{font-size:23px;margin:0 0 8px}
-.card p{color:#A8B3C9;font-size:17px;line-height:1.45;margin:0 0 20px}
-.row{display:flex;align-items:center;gap:34px;margin:6px 0 18px}
-.sq{width:160px;height:160px;border-radius:48px;overflow:hidden;background:#0B0F1A;box-shadow:0 10px 40px rgba(0,0,0,.5)}
-.sq2{width:80px;height:80px;border-radius:24px;overflow:hidden;background:#0B0F1A}
-.mono{width:100px;height:100px;border-radius:50%;overflow:hidden;background:#E9ECF4}
-.note{color:#6F7B95;font-size:16px;line-height:1.4}
+body{margin:0;background:#101014;color:#F4F1EA;font-family:Inter,system-ui,sans-serif;padding:40px 48px;width:1900px}
+h1{font-size:36px;margin:0 0 6px;font-weight:700}
+.sub{color:#A9A6A0;font-size:19px;margin-bottom:30px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:34px}
+.card{background:#18181E;border-radius:26px;padding:30px 32px}
+.card h2{font-size:24px;margin:0 0 8px}
+.card p{color:#B5B2AB;font-size:17px;line-height:1.45;margin:0 0 22px;min-height:50px}
+.row{display:flex;align-items:center;gap:40px}
+.sq{width:200px;height:200px;border-radius:58px;overflow:hidden;box-shadow:0 18px 50px rgba(0,0,0,.55)}
+.sq2{width:96px;height:96px;border-radius:28px;overflow:hidden}
+.sq3{width:48px;height:48px;border-radius:14px;overflow:hidden}
+.light{background:#ECE9E2;border-radius:30px;padding:26px 30px;display:flex;gap:26px;align-items:center}
 svg{display:block;width:100%;height:100%}
-.foot{color:#A8B3C9;font-size:19px;margin-top:30px}
 </style></head><body>
-<h1>Ikshana — the launcher icon, four ways</h1>
-<div class="sub">Each in Android's squircle at 160 and 80 px, and as the themed (monochrome) icon. Ink background, Iris blue #6FD3FF. Everything sits inside the 66 dp safe zone.</div>
+<h1>Ikshana — four marks</h1>
+<div class="sub">At 200, 96 and 48 px, and on a light shelf. Each is one idea, filled and lit, made to be seen from across a room.</div>
 <div class="grid">
 
-<div class="card"><h2>A · One line, one eye ★</h2>
-<p>An open eye drawn as a single unbroken stroke: the upper lid sweeps in, rounds the iris and leaves as the lower lid. The pupil is the one blue dot. Nothing else.</p>
+<div class="card"><h2>A · Bindu — the point that sees</h2>
+<p>No eye at all. A single warm point of light in deep indigo, and the rings of seeing spreading from it. The bindu is where sight begins; it also looks like a pupil catching light, a sonar ping, a lens flare.</p>
 <div class="row">
-<div class="sq"><svg viewBox="0 0 108 108"><rect width="108" height="108" fill="#0B0F1A"/>
-<path d="M22 54 C 34 36, 74 36, 86 54 C 74 72, 34 72, 22 54" fill="none" stroke="#F6F7FB" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
-<circle cx="54" cy="54" r="9" fill="#6FD3FF"/></svg></div>
-<div class="sq2"><svg viewBox="0 0 108 108"><rect width="108" height="108" fill="#0B0F1A"/>
-<path d="M22 54 C 34 36, 74 36, 86 54 C 74 72, 34 72, 22 54" fill="none" stroke="#F6F7FB" stroke-width="6.5" stroke-linecap="round"/>
-<circle cx="54" cy="54" r="9" fill="#6FD3FF"/></svg></div>
-<div class="mono"><svg viewBox="0 0 108 108">
-<path d="M22 54 C 34 36, 74 36, 86 54 C 74 72, 34 72, 22 54" fill="none" stroke="#0B0F1A" stroke-width="6.5" stroke-linecap="round"/>
-<circle cx="54" cy="54" r="9" fill="#0B0F1A"/></svg></div></div>
-<div class="note">The quietest. Reads at 80 px; the risk is every eye-care and privacy app on the shelf also draws an eye.</div></div>
+<div class="sq"><svg viewBox="0 0 108 108">
+<defs><radialGradient id="abg" cx="50%" cy="48%" r="70%"><stop offset="0" stop-color="#3B2F7A"/><stop offset=".55" stop-color="#1D1850"/><stop offset="1" stop-color="#0D0B26"/></radialGradient>
+<radialGradient id="adot" cx="40%" cy="38%" r="70%"><stop offset="0" stop-color="#FFF4C8"/><stop offset=".5" stop-color="#FFC43D"/><stop offset="1" stop-color="#F08A1C"/></radialGradient>
+<filter id="aglow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="5"/></filter></defs>
+<rect width="108" height="108" fill="url(#abg)"/>
+<g fill="none" stroke="#C9B8FF" stroke-linecap="round"><circle cx="54" cy="54" r="22" stroke-width="2.2" opacity=".85"/><circle cx="54" cy="54" r="33" stroke-width="2" opacity=".45"/><circle cx="54" cy="54" r="44" stroke-width="1.8" opacity=".2"/></g>
+<circle cx="54" cy="54" r="13" fill="#FFB52E" opacity=".7" filter="url(#aglow)"/>
+<circle cx="54" cy="54" r="10" fill="url(#adot)"/>
+<circle cx="50" cy="50" r="2.6" fill="#FFFFFF" opacity=".9"/></svg></div>
+<div class="sq2"><svg viewBox="0 0 108 108"><rect width="108" height="108" fill="url(#abg)"/>
+<g fill="none" stroke="#C9B8FF" stroke-linecap="round"><circle cx="54" cy="54" r="22" stroke-width="2.4" opacity=".85"/><circle cx="54" cy="54" r="33" stroke-width="2.2" opacity=".45"/><circle cx="54" cy="54" r="44" stroke-width="2" opacity=".2"/></g>
+<circle cx="54" cy="54" r="13" fill="#FFB52E" opacity=".7" filter="url(#aglow)"/><circle cx="54" cy="54" r="10" fill="url(#adot)"/><circle cx="50" cy="50" r="2.6" fill="#fff" opacity=".9"/></svg></div>
+<div class="sq3"><svg viewBox="0 0 108 108"><rect width="108" height="108" fill="url(#abg)"/>
+<g fill="none" stroke="#C9B8FF"><circle cx="54" cy="54" r="22" stroke-width="3" opacity=".85"/><circle cx="54" cy="54" r="34" stroke-width="2.6" opacity=".4"/></g>
+<circle cx="54" cy="54" r="11" fill="url(#adot)"/></svg></div>
+<div class="light"><div class="sq2"><svg viewBox="0 0 108 108"><rect width="108" height="108" fill="url(#abg)"/>
+<g fill="none" stroke="#C9B8FF"><circle cx="54" cy="54" r="22" stroke-width="2.4" opacity=".85"/><circle cx="54" cy="54" r="33" stroke-width="2.2" opacity=".45"/><circle cx="54" cy="54" r="44" stroke-width="2" opacity=".2"/></g>
+<circle cx="54" cy="54" r="13" fill="#FFB52E" opacity=".7" filter="url(#aglow)"/><circle cx="54" cy="54" r="10" fill="url(#adot)"/><circle cx="50" cy="50" r="2.6" fill="#fff" opacity=".9"/></svg></div></div>
+</div></div>
 
-<div class="card"><h2>B · The eye in the viewfinder</h2>
-<p>Four camera brackets around the blue pupil, with the lids left out. The brackets say camera, the dot says seeing, and the gap between them is the frame the person holds the phone up to.</p>
+<div class="card"><h2>B · Padmaksha — the lotus eye</h2>
+<p>The old Indian word for a beautiful eye is "lotus-eyed". Two lotus petals in coral and gold make the lids; the iris is a deep teal disc with a light in it. Warm, Indian, and no other camera app looks like it.</p>
 <div class="row">
-<div class="sq"><svg viewBox="0 0 108 108"><rect width="108" height="108" fill="#0B0F1A"/>
-<g fill="none" stroke="#F6F7FB" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round">
-<path d="M26 40 V32 a6 6 0 0 1 6 -6 H40"/><path d="M68 26 H76 a6 6 0 0 1 6 6 V40"/>
-<path d="M82 68 V76 a6 6 0 0 1 -6 6 H68"/><path d="M40 82 H32 a6 6 0 0 1 -6 -6 V68"/></g>
-<path d="M34 54 C 42 44, 66 44, 74 54 C 66 64, 42 64, 34 54" fill="#F6F7FB"/>
-<circle cx="54" cy="54" r="7.5" fill="#6FD3FF"/></svg></div>
-<div class="sq2"><svg viewBox="0 0 108 108"><rect width="108" height="108" fill="#0B0F1A"/>
-<g fill="none" stroke="#F6F7FB" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round">
-<path d="M26 40 V32 a6 6 0 0 1 6 -6 H40"/><path d="M68 26 H76 a6 6 0 0 1 6 6 V40"/>
-<path d="M82 68 V76 a6 6 0 0 1 -6 6 H68"/><path d="M40 82 H32 a6 6 0 0 1 -6 -6 V68"/></g>
-<path d="M34 54 C 42 44, 66 44, 74 54 C 66 64, 42 64, 34 54" fill="#F6F7FB"/>
-<circle cx="54" cy="54" r="7.5" fill="#6FD3FF"/></svg></div>
-<div class="mono"><svg viewBox="0 0 108 108">
-<g fill="none" stroke="#0B0F1A" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round">
-<path d="M26 40 V32 a6 6 0 0 1 6 -6 H40"/><path d="M68 26 H76 a6 6 0 0 1 6 6 V40"/>
-<path d="M82 68 V76 a6 6 0 0 1 -6 6 H68"/><path d="M40 82 H32 a6 6 0 0 1 -6 -6 V68"/></g>
-<path d="M34 54 C 42 44, 66 44, 74 54 C 66 64, 42 64, 34 54" fill="#0B0F1A"/>
-<circle cx="54" cy="54" r="7.5" fill="#E9ECF4"/></svg></div></div>
-<div class="note">Says "camera" first. Brackets are Still's family mark too, so the two apps would rhyme on a shelf.</div></div>
+<div class="sq"><svg viewBox="0 0 108 108">
+<defs><linearGradient id="bbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2A0F3A"/><stop offset="1" stop-color="#120716"/></linearGradient>
+<linearGradient id="bpet" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD27A"/><stop offset="1" stop-color="#F26B4E"/></linearGradient>
+<linearGradient id="bpet2" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#FFB86B"/><stop offset="1" stop-color="#E8503E"/></linearGradient>
+<radialGradient id="biris" cx="40%" cy="35%" r="75%"><stop offset="0" stop-color="#7FE3E0"/><stop offset=".55" stop-color="#128C8A"/><stop offset="1" stop-color="#063F43"/></radialGradient></defs>
+<rect width="108" height="108" fill="url(#bbg)"/>
+<path d="M16 54 C 30 28, 78 28, 92 54 C 78 46, 30 46, 16 54 Z" fill="url(#bpet)"/>
+<path d="M16 54 C 30 80, 78 80, 92 54 C 78 62, 30 62, 16 54 Z" fill="url(#bpet2)"/>
+<path d="M22 54 C 34 40, 74 40, 86 54 C 74 68, 34 68, 22 54 Z" fill="#FFF4E6"/>
+<circle cx="54" cy="54" r="13.5" fill="url(#biris)"/><circle cx="54" cy="54" r="5.5" fill="#06181C"/><circle cx="58.5" cy="49" r="2.8" fill="#fff"/></svg></div>
+<div class="sq2"><svg viewBox="0 0 108 108"><rect width="108" height="108" fill="url(#bbg)"/>
+<path d="M16 54 C 30 28, 78 28, 92 54 C 78 46, 30 46, 16 54 Z" fill="url(#bpet)"/><path d="M16 54 C 30 80, 78 80, 92 54 C 78 62, 30 62, 16 54 Z" fill="url(#bpet2)"/>
+<path d="M22 54 C 34 40, 74 40, 86 54 C 74 68, 34 68, 22 54 Z" fill="#FFF4E6"/><circle cx="54" cy="54" r="13.5" fill="url(#biris)"/><circle cx="54" cy="54" r="5.5" fill="#06181C"/><circle cx="58.5" cy="49" r="2.8" fill="#fff"/></svg></div>
+<div class="sq3"><svg viewBox="0 0 108 108"><rect width="108" height="108" fill="url(#bbg)"/>
+<path d="M14 54 C 30 26, 78 26, 94 54 C 78 46, 30 46, 14 54 Z" fill="url(#bpet)"/><path d="M14 54 C 30 82, 78 82, 94 54 C 78 62, 30 62, 14 54 Z" fill="url(#bpet2)"/>
+<path d="M22 54 C 34 40, 74 40, 86 54 C 74 68, 34 68, 22 54 Z" fill="#FFF4E6"/><circle cx="54" cy="54" r="14" fill="url(#biris)"/><circle cx="54" cy="54" r="6" fill="#06181C"/></svg></div>
+<div class="light"><div class="sq2"><svg viewBox="0 0 108 108"><rect width="108" height="108" fill="url(#bbg)"/>
+<path d="M16 54 C 30 28, 78 28, 92 54 C 78 46, 30 46, 16 54 Z" fill="url(#bpet)"/><path d="M16 54 C 30 80, 78 80, 92 54 C 78 62, 30 62, 16 54 Z" fill="url(#bpet2)"/>
+<path d="M22 54 C 34 40, 74 40, 86 54 C 74 68, 34 68, 22 54 Z" fill="#FFF4E6"/><circle cx="54" cy="54" r="13.5" fill="url(#biris)"/><circle cx="54" cy="54" r="5.5" fill="#06181C"/><circle cx="58.5" cy="49" r="2.8" fill="#fff"/></svg></div></div>
+</div></div>
 
-<div class="card"><h2>C · The eye that speaks ★</h2>
-<p>The same one-line eye, but the lower lid does not close: it runs out to the right as a short wave, the way Stave's staff becomes a sound. Seeing turning into speaking is the whole app in one gesture.</p>
+<div class="card"><h2>C · Dawn aperture — the camera that lights the dark</h2>
+<p>A camera aperture, but what shows through the blades is a sunrise: amber light rising into a night-blue sky. The app opens a shutter on a dark world and there is light behind it. Reads as camera at 48 px, as warmth at 200.</p>
 <div class="row">
-<div class="sq"><svg viewBox="0 0 108 108"><rect width="108" height="108" fill="#0B0F1A"/>
-<path d="M20 54 C 31 37, 65 37, 76 54 C 65 71, 31 71, 20 54" fill="none" stroke="#F6F7FB" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M66 64 C 72 58, 76 70, 82 62 C 86 57, 88 60, 91 58" fill="none" stroke="#6FD3FF" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
-<circle cx="48" cy="54" r="9" fill="#6FD3FF"/></svg></div>
-<div class="sq2"><svg viewBox="0 0 108 108"><rect width="108" height="108" fill="#0B0F1A"/>
-<path d="M20 54 C 31 37, 65 37, 76 54 C 65 71, 31 71, 20 54" fill="none" stroke="#F6F7FB" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M66 64 C 72 58, 76 70, 82 62 C 86 57, 88 60, 91 58" fill="none" stroke="#6FD3FF" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
-<circle cx="48" cy="54" r="9" fill="#6FD3FF"/></svg></div>
-<div class="mono"><svg viewBox="0 0 108 108">
-<path d="M20 54 C 31 37, 65 37, 76 54 C 65 71, 31 71, 20 54" fill="none" stroke="#0B0F1A" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M66 64 C 72 58, 76 70, 82 62 C 86 57, 88 60, 91 58" fill="none" stroke="#0B0F1A" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
-<circle cx="48" cy="54" r="9" fill="#0B0F1A"/></svg></div></div>
-<div class="note">The story of the app in one mark. The wave must stay short or it reads as a tear; holds in one colour.</div></div>
+<div class="sq"><svg viewBox="0 0 108 108">
+<defs><linearGradient id="cbg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0E2A4A"/><stop offset="1" stop-color="#071326"/></linearGradient>
+<linearGradient id="csky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2E5C9A"/><stop offset=".55" stop-color="#F07A3A"/><stop offset="1" stop-color="#FFD36A"/></linearGradient>
+<clipPath id="chole"><circle cx="54" cy="54" r="21"/></clipPath>
+<filter id="cglow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="4"/></filter></defs>
+<rect width="108" height="108" fill="url(#cbg)"/>
+<circle cx="54" cy="54" r="26" fill="#FFB347" opacity=".55" filter="url(#cglow)"/>
+<g clip-path="url(#chole)"><rect x="33" y="33" width="42" height="42" fill="url(#csky)"/><circle cx="54" cy="66" r="9" fill="#FFF1B8"/></g>
+<g fill="#F4F1EA" opacity=".96">
+<path d="M54 18 L74 24 L58 36 Z"/><path d="M90 54 L84 74 L72 58 Z"/><path d="M54 90 L34 84 L50 72 Z"/><path d="M18 54 L24 34 L36 50 Z"/>
+<path d="M79 29 L84 48 L66 42 Z"/><path d="M79 79 L60 84 L66 66 Z"/><path d="M29 79 L24 60 L42 66 Z"/><path d="M29 29 L48 24 L42 42 Z"/>
+</g>
+<circle cx="54" cy="54" r="36" fill="none" stroke="#F4F1EA" stroke-width="5" opacity=".96"/></svg></div>
+<div class="sq2"><svg viewBox="0 0 108 108"><rect width="108" height="108" fill="url(#cbg)"/><circle cx="54" cy="54" r="26" fill="#FFB347" opacity=".55" filter="url(#cglow)"/>
+<g clip-path="url(#chole)"><rect x="33" y="33" width="42" height="42" fill="url(#csky)"/><circle cx="54" cy="66" r="9" fill="#FFF1B8"/></g>
+<g fill="#F4F1EA"><path d="M54 18 L74 24 L58 36 Z"/><path d="M90 54 L84 74 L72 58 Z"/><path d="M54 90 L34 84 L50 72 Z"/><path d="M18 54 L24 34 L36 50 Z"/><path d="M79 29 L84 48 L66 42 Z"/><path d="M79 79 L60 84 L66 66 Z"/><path d="M29 79 L24 60 L42 66 Z"/><path d="M29 29 L48 24 L42 42 Z"/></g>
+<circle cx="54" cy="54" r="36" fill="none" stroke="#F4F1EA" stroke-width="5"/></svg></div>
+<div class="sq3"><svg viewBox="0 0 108 108"><rect width="108" height="108" fill="url(#cbg)"/>
+<g clip-path="url(#chole)"><rect x="33" y="33" width="42" height="42" fill="url(#csky)"/><circle cx="54" cy="66" r="9" fill="#FFF1B8"/></g>
+<g fill="#F4F1EA"><path d="M54 18 L74 24 L58 36 Z"/><path d="M90 54 L84 74 L72 58 Z"/><path d="M54 90 L34 84 L50 72 Z"/><path d="M18 54 L24 34 L36 50 Z"/><path d="M79 29 L84 48 L66 42 Z"/><path d="M79 79 L60 84 L66 66 Z"/><path d="M29 79 L24 60 L42 66 Z"/><path d="M29 29 L48 24 L42 42 Z"/></g>
+<circle cx="54" cy="54" r="36" fill="none" stroke="#F4F1EA" stroke-width="6"/></svg></div>
+<div class="light"><div class="sq2"><svg viewBox="0 0 108 108"><rect width="108" height="108" fill="url(#cbg)"/><circle cx="54" cy="54" r="26" fill="#FFB347" opacity=".55" filter="url(#cglow)"/>
+<g clip-path="url(#chole)"><rect x="33" y="33" width="42" height="42" fill="url(#csky)"/><circle cx="54" cy="66" r="9" fill="#FFF1B8"/></g>
+<g fill="#F4F1EA"><path d="M54 18 L74 24 L58 36 Z"/><path d="M90 54 L84 74 L72 58 Z"/><path d="M54 90 L34 84 L50 72 Z"/><path d="M18 54 L24 34 L36 50 Z"/><path d="M79 29 L84 48 L66 42 Z"/><path d="M79 79 L60 84 L66 66 Z"/><path d="M29 79 L24 60 L42 66 Z"/><path d="M29 29 L48 24 L42 42 Z"/></g>
+<circle cx="54" cy="54" r="36" fill="none" stroke="#F4F1EA" stroke-width="5"/></svg></div></div>
+</div></div>
 
-<div class="card"><h2>D · The braille eye</h2>
-<p>A bold blue iris ring, and inside it the pupil is a braille cell: dots 2 and 4, the letter I, for Ikshana. Sighted people see an eye; a braille reader who has it described hears their own alphabet in it.</p>
+<div class="card"><h2>D · The guiding hand</h2>
+<p>An open palm, and above it a point of light with its halo. Ikshana's second meaning is looking after; this is the hand that is offered, and the light it holds up. Nothing about cameras, everything about care. The one a blind user would choose.</p>
 <div class="row">
-<div class="sq"><svg viewBox="0 0 108 108"><rect width="108" height="108" fill="#0B0F1A"/>
-<path d="M18 54 C 30 34, 78 34, 90 54 C 78 74, 30 74, 18 54" fill="none" stroke="#F6F7FB" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-<circle cx="54" cy="54" r="15" fill="#6FD3FF"/>
-<circle cx="49" cy="54" r="3.4" fill="#0B0F1A"/><circle cx="59" cy="48" r="3.4" fill="#0B0F1A"/>
-<circle cx="49" cy="48" r="3.4" fill="#0B0F1A" opacity=".22"/><circle cx="49" cy="60" r="3.4" fill="#0B0F1A" opacity=".22"/><circle cx="59" cy="54" r="3.4" fill="#0B0F1A" opacity=".22"/><circle cx="59" cy="60" r="3.4" fill="#0B0F1A" opacity=".22"/></svg></div>
-<div class="sq2"><svg viewBox="0 0 108 108"><rect width="108" height="108" fill="#0B0F1A"/>
-<path d="M18 54 C 30 34, 78 34, 90 54 C 78 74, 30 74, 18 54" fill="none" stroke="#F6F7FB" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-<circle cx="54" cy="54" r="15" fill="#6FD3FF"/>
-<circle cx="49" cy="54" r="3.4" fill="#0B0F1A"/><circle cx="59" cy="48" r="3.4" fill="#0B0F1A"/></svg></div>
-<div class="mono"><svg viewBox="0 0 108 108">
-<path d="M18 54 C 30 34, 78 34, 90 54 C 78 74, 30 74, 18 54" fill="none" stroke="#0B0F1A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-<circle cx="54" cy="54" r="15" fill="#0B0F1A"/>
-<circle cx="49" cy="54" r="3.4" fill="#E9ECF4"/><circle cx="59" cy="48" r="3.4" fill="#E9ECF4"/></svg></div></div>
-<div class="note">The most meaningful and the busiest. At 48 px the cell becomes two specks; the big icon carries it, the small one only the eye.</div></div>
+<div class="sq"><svg viewBox="0 0 108 108">
+<defs><linearGradient id="dbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0F3D3A"/><stop offset="1" stop-color="#061A1C"/></linearGradient>
+<radialGradient id="dlight" cx="45%" cy="40%" r="70%"><stop offset="0" stop-color="#FFFBE6"/><stop offset=".45" stop-color="#FFD54A"/><stop offset="1" stop-color="#F59E0B"/></radialGradient>
+<linearGradient id="dhand" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F7F3EA"/><stop offset="1" stop-color="#D9D2C2"/></linearGradient>
+<filter id="dglow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="6"/></filter></defs>
+<rect width="108" height="108" fill="url(#dbg)"/>
+<circle cx="54" cy="36" r="15" fill="#FFC53D" opacity=".6" filter="url(#dglow)"/>
+<circle cx="54" cy="36" r="9" fill="url(#dlight)"/>
+<g fill="none" stroke="#9FE1D6" stroke-width="2" stroke-linecap="round" opacity=".7"><path d="M34 30 A22 22 0 0 1 40 20"/><path d="M74 30 A22 22 0 0 0 68 20"/></g>
+<path d="M36 62 C 36 56, 44 56, 44 62 L44 54 C44 49, 51 49, 51 54 L51 50 C51 45, 58 45, 58 50 L58 54 C58 49, 65 49, 65 54 L65 64 C65 58, 73 59, 72 66 L70 80 C68 88, 60 92, 52 92 C44 92, 40 88, 37 82 L30 70 C27 65, 33 61, 36 64 Z" fill="url(#dhand)"/>
+</svg></div>
+<div class="sq2"><svg viewBox="0 0 108 108"><rect width="108" height="108" fill="url(#dbg)"/><circle cx="54" cy="36" r="15" fill="#FFC53D" opacity=".6" filter="url(#dglow)"/><circle cx="54" cy="36" r="9" fill="url(#dlight)"/>
+<g fill="none" stroke="#9FE1D6" stroke-width="2.4" stroke-linecap="round" opacity=".7"><path d="M34 30 A22 22 0 0 1 40 20"/><path d="M74 30 A22 22 0 0 0 68 20"/></g>
+<path d="M36 62 C 36 56, 44 56, 44 62 L44 54 C44 49, 51 49, 51 54 L51 50 C51 45, 58 45, 58 50 L58 54 C58 49, 65 49, 65 54 L65 64 C65 58, 73 59, 72 66 L70 80 C68 88, 60 92, 52 92 C44 92, 40 88, 37 82 L30 70 C27 65, 33 61, 36 64 Z" fill="url(#dhand)"/></svg></div>
+<div class="sq3"><svg viewBox="0 0 108 108"><rect width="108" height="108" fill="url(#dbg)"/><circle cx="54" cy="36" r="15" fill="#FFC53D" opacity=".6" filter="url(#dglow)"/><circle cx="54" cy="36" r="10" fill="url(#dlight)"/>
+<path d="M36 62 C 36 56, 44 56, 44 62 L44 54 C44 49, 51 49, 51 54 L51 50 C51 45, 58 45, 58 50 L58 54 C58 49, 65 49, 65 54 L65 64 C65 58, 73 59, 72 66 L70 80 C68 88, 60 92, 52 92 C44 92, 40 88, 37 82 L30 70 C27 65, 33 61, 36 64 Z" fill="url(#dhand)"/></svg></div>
+<div class="light"><div class="sq2"><svg viewBox="0 0 108 108"><rect width="108" height="108" fill="url(#dbg)"/><circle cx="54" cy="36" r="15" fill="#FFC53D" opacity=".6" filter="url(#dglow)"/><circle cx="54" cy="36" r="9" fill="url(#dlight)"/>
+<g fill="none" stroke="#9FE1D6" stroke-width="2.4" stroke-linecap="round" opacity=".7"><path d="M34 30 A22 22 0 0 1 40 20"/><path d="M74 30 A22 22 0 0 0 68 20"/></g>
+<path d="M36 62 C 36 56, 44 56, 44 62 L44 54 C44 49, 51 49, 51 54 L51 50 C51 45, 58 45, 58 50 L58 54 C58 49, 65 49, 65 54 L65 64 C65 58, 73 59, 72 66 L70 80 C68 88, 60 92, 52 92 C44 92, 40 88, 37 82 L30 70 C27 65, 33 61, 36 64 Z" fill="url(#dhand)"/></svg></div></div>
+</div></div>
 
-</div>
-<div class="foot">Masks differ by launcher (circle, squircle, rounded square); every mark sits inside the 66 dp safe zone so none of them clips. The 6.5 dp stroke is what made Stave's final mark readable where its first one smudged.</div>
-</body></html>
+</div></body></html>
