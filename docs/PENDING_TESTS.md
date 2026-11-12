@@ -47,3 +47,19 @@ own data (Ikshana keeps none yet).
    twin play.
 9. **Thermal**: hard to force; note the first time `THERMAL_STATUS_MODERATE` is crossed in a
    long session and what was said.
+10. **Money** (interim, the borrowed reader): a ₹10, ₹100 and ₹500 note held flat a hand's
+    length away, each said once when two of three frames agree (`IkshanaMoney`, `IkshanaSay`),
+    and each note's buzz felt different. A folded note that hides its numerals: no value, then
+    "Nothing found" paced, never a guess.
+11. **Describe** (the 1B vision model pushed by adb to the app's external files
+    `models/vision/`, two `.gguf` files only): "Looking." once, then two sentences within a
+    stated time (`IkshanaDescribe` gives the milliseconds); the same wall not described again;
+    turning to another wall described after 6 s; a hand over the lens says it is too dark.
+    Peak memory and warmth over ten minutes noted.
+12. **Ask**: entering says the first question and asks it of the next clear frame at once;
+    swipe up (or the button, or TalkBack's "Next question") says the next question and asks it
+    once (`IkshanaAsk`); a medicine strip under "What is the expiry date?" answered or told
+    where to move; no "nothing found" while no question waits.
+13. **Find**: "Finding a door." on entering; a door left, ahead and right of the camera said as
+    such (`IkshanaFind`), a long pulse within reach and a tick further; a room without one gives
+    paced "Nothing found", never a direction; swipe up steps to a chair, a cup and so on.

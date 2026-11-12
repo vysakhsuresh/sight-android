@@ -24,6 +24,11 @@ import com.layerbit.ikshana.engine.see.DescribePacer
 import com.layerbit.ikshana.engine.see.FrameGate
 import com.layerbit.ikshana.engine.see.Gate
 import com.layerbit.ikshana.engine.see.Prompts
+import com.layerbit.ikshana.engine.see.AskTurn
+import com.layerbit.ikshana.engine.see.Choice
+import com.layerbit.ikshana.engine.see.Find
+import com.layerbit.ikshana.engine.see.Question
+import com.layerbit.ikshana.engine.see.Thing
 import com.layerbit.ikshana.engine.mode.Line
 import com.layerbit.ikshana.engine.mode.Said
 import com.layerbit.ikshana.engine.mode.CameraState
@@ -85,8 +90,18 @@ class Session(private val context: Context, val prefs: Prefs) {
      *  before every description it would be noise. */
     @Volatile private var lookedSinceEnter = false
 
-    /** Read by the camera's thread: colour frames only while Describe runs. */
-    val wantsColour: Boolean get() = activeNow == Mode.DESCRIBE
+    /** Ask's question in flight, and the ready questions and things a swipe up steps through
+     *  until a spoken one can be heard (ROADMAP P6). */
+    private val askTurn = AskTurn()
+    private val questions = Choice(Question.entries)
+    private val things = Choice(Thing.entries)
+    /** What Find looks for; written on main, read by the camera's thread. */
+    @Volatile private var finding: Thing = things.current
+    /** The question or thing on screen, as a button that steps it, in Ask and Find; else null. */
+    var choiceShown: String? by mutableStateOf(null); private set
+
+    /** Read by the camera's thread: colour frames only while the vision model is in use. */
+    val wantsColour: Boolean get() = activeNow in SEEING
 
     /** The app opened: the camera's permission is known by now, the last mode is in Prefs. */
     fun start(camera: CameraState, afterCrash: Boolean) {
@@ -111,7 +126,34 @@ class Session(private val context: Context, val prefs: Prefs) {
         }
         if (state.wanted.onRow) prefs.lastMode = state.wanted
         activeNow = state.active
+        if (state.active != before) entered(state.active)
     }
+
+    /** Ask and Find say what they will do on entering: with no words of its own after "Ask.",
+     *  the mode is a silence nobody knows how to fill. Ask puts its current question to the
+     *  next clear frame at once, so the commonest question needs no gesture at all. */
+    private fun entered(mode: Mode) {
+        askTurn.clear()
+        when (mode) {
+            Mode.ASK -> {
+                askTurn.choose(questions.current)
+                speak(context.getString(R.string.ask_hint, context.getString(Labels.question(questions.current))))
+            }
+            Mode.FIND -> speak(context.getString(R.string.find_hint, context.getString(Labels.thing(finding))))
+            else -> Unit
+        }
+        showChoice()
+    }
+
+    private fun showChoice() {
+        choiceShown = when (state.active) {
+            Mode.ASK -> context.getString(Labels.question(questions.current))
+            Mode.FIND -> context.getString(R.string.find_choice, context.getString(Labels.thing(finding)))
+            else -> null
+        }
+    }
+
+    private fun speak(text: String) { Log.i("IkshanaSay", text); voice.say(text) }
 
     /**
      * A settled camera frame, on the analysis thread. Light level samples it twice a second;
@@ -129,7 +171,7 @@ class Session(private val context: Context, val prefs: Prefs) {
             }
             Mode.READ -> readFrame(f)
             Mode.MONEY -> moneyFrame(f)
-            Mode.DESCRIBE -> describeFrame(f)
+            Mode.DESCRIBE, Mode.FIND, Mode.ASK -> seeFrame(f, activeNow)
             else -> Unit
         }
     }
@@ -182,47 +224,72 @@ class Session(private val context: Context, val prefs: Prefs) {
     }
 
     /**
-     * Describe: a frame the scene has changed enough to describe (DescribePacer), that the gate
-     * lets through (no black or smeared frame reaches the model, FrameGate), is described by the
-     * vision model and cut to two plain sentences (Describe.clean) before it is spoken.
+     * Describe, Ask and Find, on the one vision model. No black or smeared frame reaches it
+     * (FrameGate). Describe looks when the scene has changed (DescribePacer); Ask when a question
+     * waits (AskTurn), once; Find on every clear frame. Words are cut to two plain sentences
+     * (Describe.clean); a box becomes a place only through Find.answer.
      */
-    private fun describeFrame(f: CameraDoor.Frame) {
+    private fun seeFrame(f: CameraDoor.Frame, mode: Mode) {
         val rgb = f.colour ?: return
+        // Ask looks only when a question waits; otherwise every dark frame would say so.
+        if (mode == Mode.ASK && !askTurn.waiting()) return
         val now = System.currentTimeMillis()
         val tight = ReadText.rotate(f.y, f.width, f.height, f.rowStride, 0)
         val thumb = DescribePacer.thumb(tight.bytes, tight.width, tight.height)
-        if (!describePacer.due(now, thumb)) return
+        if (mode == Mode.DESCRIBE && !describePacer.due(now, thumb)) return
         when (FrameGate.check(tight.bytes, tight.width, tight.height)) {
             Gate.TOO_DARK -> {
-                describePacer.described(now, thumb)
-                send(Event.NothingFound(Hint.TOO_DARK)); return
+                if (mode == Mode.DESCRIBE) describePacer.described(now, thumb)
+                main.post { if (activeNow == mode && pacer.onRead(now, false)) send(Event.NothingFound(Hint.TOO_DARK)) }
+                return
             }
             // Not marked described: the next sharp frame of the same scene should go through.
             Gate.BLURRED -> {
-                main.post { if (activeNow == Mode.DESCRIBE && pacer.onRead(now, false)) send(Event.NothingFound(Hint.BLURRED)) }
+                main.post { if (activeNow == mode && pacer.onRead(now, false)) send(Event.NothingFound(Hint.BLURRED)) }
                 return
             }
             Gate.OK -> Unit
         }
-        describePacer.described(now, thumb)
+        val prompt = when (mode) {
+            Mode.DESCRIBE -> { describePacer.described(now, thumb); Prompts.DESCRIBE }
+            Mode.ASK -> Prompts.ask((askTurn.take() ?: return).english)
+            else -> Prompts.find(finding.english)
+        }
         if (!lookedSinceEnter) {
             lookedSinceEnter = true
-            main.post { if (activeNow == Mode.DESCRIBE) Labels.said(context, Said(Line.LOOKING)).let { Log.i("IkshanaSay", it); voice.say(it) } }
+            main.post { if (activeNow == mode) speak(Labels.said(context, Said(Line.LOOKING))) }
         }
         val model = vision ?: VisionModel.open(VisionModel.folder(context), THREADS)?.also { vision = it }
         if (model == null) { send(Event.ModelFailed(Models.VLM)); return }
         val started = System.currentTimeMillis()
-        val raw = try { model.ask(rgb.bytes, rgb.width, rgb.height, Prompts.DESCRIBE, 64) } catch (e: Throwable) {
-            Log.w("Ikshana", "describe failed", e); null
+        // A box is a dozen tokens; a description or an answer, two sentences.
+        val raw = try { model.ask(rgb.bytes, rgb.width, rgb.height, prompt, if (mode == Mode.FIND) 24 else 64) } catch (e: Throwable) {
+            Log.w("Ikshana", "vision failed", e); null
         }
+        Log.i("Ikshana" + mode.name.lowercase().replaceFirstChar { it.uppercaseChar() }, "${rgb.width}x${rgb.height} in ${System.currentTimeMillis() - started} ms: $raw")
+        if (mode == Mode.FIND) { foundFrame(raw); return }
         val text = raw?.let { Describe.clean(it) }
-        Log.i("IkshanaDescribe", "${rgb.width}x${rgb.height} in ${System.currentTimeMillis() - started} ms: $raw")
         main.post {
-            if (activeNow != Mode.DESCRIBE) return@post
+            if (activeNow != mode) return@post
             pacer.onRead(System.currentTimeMillis(), text != null)
             if (raw == null) send(Event.ModelFailed(Models.VLM))
             else if (text == null) send(Event.NothingFound(Hint.NONE))
             else { Log.i("IkshanaSay", text); voice.say(text, "en-IN") }
+        }
+    }
+
+    /** Find: a place only from a box the model drew and did not deny (Find.answer); the words
+     *  in the phone's language, felt as a long pulse within reach and a tick further off. */
+    private fun foundFrame(raw: String?) {
+        val place = raw?.let { Find.answer(it) }
+        main.post {
+            if (activeNow != Mode.FIND) return@post
+            if (raw == null) { send(Event.ModelFailed(Models.VLM)); return@post }
+            if (pacer.onRead(System.currentTimeMillis(), place != null)) send(Event.NothingFound(Hint.NONE))
+            if (place != null) {
+                speak(context.getString(Labels.place(place)))
+                feedback.buzz(Find.pattern(place))
+            }
         }
     }
 
@@ -245,7 +312,16 @@ class Session(private val context: Context, val prefs: Prefs) {
     }
 
     fun repeat() = voice.repeat()
-    fun next() { if (!voice.next()) feedback.play(Earcon.REPEAT) }
+    /** Swipe up: the next thing to hear; in Ask the next question (asked of the next clear
+     *  frame), in Find the next thing to look for. */
+    fun next() {
+        when (state.active) {
+            Mode.ASK -> { val q = questions.next(); askTurn.choose(q); speak(context.getString(Labels.question(q))) }
+            Mode.FIND -> { finding = things.next(); speak(context.getString(R.string.find_choice, context.getString(Labels.thing(finding)))) }
+            else -> { if (!voice.next()) feedback.play(Earcon.REPEAT); return }
+        }
+        showChoice()
+    }
     fun togglePause() { paused = voice.togglePause() }
 
     fun stepMode(by: Int) {
@@ -272,6 +348,9 @@ class Session(private val context: Context, val prefs: Prefs) {
         /** The moto's two big cores and two of its small: more threads than big cores slows the
          *  matrix work down on a phone, measured in Stave's runners. To be measured here. */
         const val THREADS = 4
+
+        /** The modes that show the vision model colour frames. */
+        val SEEING = setOf(Mode.DESCRIBE, Mode.FIND, Mode.ASK)
 
         /**
          * The models this install carries, as assets/models/<id>.tflite (the asset pack and the

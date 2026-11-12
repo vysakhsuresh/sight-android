@@ -61,6 +61,34 @@
     <string name="action_pause">Pause or resume speech</string>
     <string name="action_next_mode">Next mode</string>
     <string name="action_previous_mode">Previous mode</string>
+    <string name="action_next_question">Next question</string>
+    <string name="action_next_thing">Find something else</string>
+
+    <!-- Ask: the ready questions, chosen by a swipe up until a spoken question can be heard. -->
+    <string name="ask_what">What is this?</string>
+    <string name="ask_colour">What colour is this?</string>
+    <string name="ask_expiry">What is the expiry date?</string>
+    <string name="ask_screen">What does the screen say?</string>
+    <string name="ask_light">Is a light on?</string>
+    <string name="ask_dose">How do I take this medicine?</string>
+    <string name="ask_hint">%1$s Hold the phone towards it. Swipe up for another question.</string>
+    <!-- Find: the things it can look for, and where it found one. -->
+    <string name="thing_door">a door</string>
+    <string name="thing_chair">a chair</string>
+    <string name="thing_table">a table</string>
+    <string name="thing_cup">a cup</string>
+    <string name="thing_bottle">a bottle</string>
+    <string name="thing_bag">a bag</string>
+    <string name="thing_phone">a phone</string>
+    <string name="thing_person">a person</string>
+    <string name="find_hint">Finding %1$s. Turn slowly. Swipe up to find something else.</string>
+    <string name="find_choice">Find %1$s</string>
+    <string name="find_left">To your left.</string>
+    <string name="find_ahead">Straight ahead.</string>
+    <string name="find_right">To your right.</string>
+    <string name="find_left_near">To your left, within reach.</string>
+    <string name="find_ahead_near">Straight ahead, within reach.</string>
+    <string name="find_right_near">To your right, within reach.</string>
     <string name="door_allow_camera">Allow the camera</string>
     <string name="door_pick_picture">Pick a picture</string>
     <string name="settings">Settings</string>

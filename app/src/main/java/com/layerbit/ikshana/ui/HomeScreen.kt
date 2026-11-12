@@ -84,6 +84,7 @@ fun HomeScreen(
                 CameraSurface(session, activeName, camera)
                 if (state.active == Mode.HELP) HelpDoors(onAllowCamera, onPickPicture)
                 session.shown?.let { Banner(it) }
+                session.choiceShown?.let { ChoiceButton(it, Modifier.align(Alignment.TopStart).padding(end = 80.dp)) { session.next() } }
                 SettingsButton(Modifier.align(Alignment.TopEnd)) { settingsOpen = true }
             }
             ModeGrid(session)
@@ -100,6 +101,8 @@ private fun CameraSurface(session: Session, activeName: String, camera: @Composa
     val repeat = stringResource(R.string.action_repeat)
     val next = stringResource(R.string.action_next_mode)
     val previous = stringResource(R.string.action_previous_mode)
+    val nextQuestion = stringResource(R.string.action_next_question)
+    val nextThing = stringResource(R.string.action_next_thing)
     val pause = stringResource(R.string.action_pause)
     val description = stringResource(R.string.camera_view, activeName)
     val paused = stringResource(R.string.paused)
@@ -112,8 +115,13 @@ private fun CameraSurface(session: Session, activeName: String, camera: @Composa
                 contentDescription = description
                 if (session.paused) stateDescription = paused
                 onClick(label = pause) { s.togglePause(); true }
-                customActions = listOf(
+                customActions = listOfNotNull(
                     CustomAccessibilityAction(repeat) { s.repeat(); true },
+                    when (session.state.active) {
+                        Mode.ASK -> CustomAccessibilityAction(nextQuestion) { s.next(); true }
+                        Mode.FIND -> CustomAccessibilityAction(nextThing) { s.next(); true }
+                        else -> null
+                    },
                     CustomAccessibilityAction(next) { s.stepMode(1); true },
                     CustomAccessibilityAction(previous) { s.stepMode(-1); true }
                 )
@@ -207,6 +215,22 @@ private fun SettingsButton(modifier: Modifier, onClick: () -> Unit) {
         // Three bars, drawn in text so there is no icon library to declare: the name is on the node.
         // Seen in the moto's dump on 12 Nov: without clearing, the glyph was read after the name.
         Text("≡", Modifier.clearAndSetSemantics { }, style = MaterialTheme.typography.headlineMedium, color = Ink.Text)
+    }
+}
+
+/** Ask's question or Find's thing, shown and stepped: the swipe up's twin for whoever cannot
+ *  swipe, or uses TalkBack, which takes the swipe for itself. Its words are its name. */
+@Composable
+private fun ChoiceButton(label: String, modifier: Modifier, onClick: () -> Unit) {
+    Box(
+        modifier.padding(8.dp).heightIn(min = Target).clip(RoundedCornerShape(14.dp))
+            .background(Ink.Surface.copy(alpha = 0.85f))
+            .border(1.dp, Ink.Iris, RoundedCornerShape(14.dp))
+            .clickable(role = Role.Button, onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        contentAlignment = Alignment.CenterStart
+    ) {
+        Text(label, style = MaterialTheme.typography.titleMedium, color = Ink.Text)
     }
 }
 

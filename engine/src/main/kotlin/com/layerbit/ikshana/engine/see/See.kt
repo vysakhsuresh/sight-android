@@ -1,5 +1,6 @@
 package com.layerbit.ikshana.engine.see
 
+import com.layerbit.ikshana.engine.feedback.Pattern
 import kotlin.math.abs
 
 /**
@@ -179,6 +180,43 @@ object Find {
     fun saysAbsent(text: String): Boolean =
         Regex("^\\s*(no|none|not (found|visible|present|here)|there is no|i (can't|cannot|do not|don't) see)\\b", RegexOption.IGNORE_CASE)
             .containsMatchIn(text)
+
+    /** The model's whole answer as a place, or null: absence is read first, so "No [0,0,500,500]"
+     *  sends nobody anywhere, and words without a box are no direction either. */
+    fun answer(text: String): Place? = if (saysAbsent(text)) null else parseBox(text)?.let(::place)
+
+    /** Felt with the words: a long pulse when it is within reach, a short tick when it is there
+     *  but further, so the hand knows whether to stretch or to walk. */
+    fun pattern(p: Place): Pattern = Pattern(longArrayOf(if (p.near) NEAR_MS else FAR_MS), intArrayOf(255))
+    const val NEAR_MS = 600L
+    const val FAR_MS = 80L
+}
+
+/** What Find can be asked for until a spoken name can be heard (P6): the things a blind person
+ *  most often searches a room for. [english] is what the model is asked; the voice names them
+ *  by [id] in the phone's language. A person is found, never named. */
+enum class Thing(val id: String, val english: String) {
+    DOOR("door", "door"), CHAIR("chair", "chair"), TABLE("table", "table"), CUP("cup", "cup"),
+    BOTTLE("bottle", "bottle"), BAG("bag", "bag"), PHONE("phone", "mobile phone"), PERSON("person", "person")
+}
+
+/** The ready question or thing, stepped by a swipe up; it wraps, so the list has no dead end. */
+class Choice<T>(private val items: List<T>) {
+    init { require(items.isNotEmpty()) { "nothing to choose" } }
+    private var index = 0
+    val current: T get() = items[index]
+    fun next(): T { index = (index + 1) % items.size; return current }
+}
+
+/** Ask's one question in flight: chosen on the main thread, taken once by the next clear frame
+ *  on the camera's thread, so a question is answered once, not again on every frame. */
+class AskTurn {
+    private var pending: Question? = null
+    @Synchronized fun choose(q: Question) { pending = q }
+    @Synchronized fun take(): Question? { val q = pending; pending = null; return q }
+    /** Whether a question waits: with none, a dark frame is nobody's business, not "nothing found". */
+    @Synchronized fun waiting(): Boolean = pending != null
+    @Synchronized fun clear() { pending = null }
 }
 
 /**

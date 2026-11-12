@@ -6,6 +6,10 @@ import com.layerbit.ikshana.engine.light.LightBand
 import com.layerbit.ikshana.engine.mode.Line
 import com.layerbit.ikshana.engine.mode.Mode
 import com.layerbit.ikshana.engine.mode.Said
+import com.layerbit.ikshana.engine.see.Place
+import com.layerbit.ikshana.engine.see.Question
+import com.layerbit.ikshana.engine.see.Side
+import com.layerbit.ikshana.engine.see.Thing
 
 /**
  * Engine ids to words, in the language the app speaks (the family's rule: engine tables reach
@@ -56,6 +60,32 @@ object Labels {
         LightBand.DIM -> R.string.light_dim
         LightBand.BRIGHT -> R.string.light_bright
         LightBand.GLARE -> R.string.light_glare
+    }
+
+    fun question(q: Question): Int = when (q) {
+        Question.WHAT_IS_THIS -> R.string.ask_what
+        Question.COLOUR -> R.string.ask_colour
+        Question.EXPIRY -> R.string.ask_expiry
+        Question.SCREEN -> R.string.ask_screen
+        Question.LIGHT_ON -> R.string.ask_light
+        Question.DOSE -> R.string.ask_dose
+    }
+
+    fun thing(t: Thing): Int = when (t) {
+        Thing.DOOR -> R.string.thing_door
+        Thing.CHAIR -> R.string.thing_chair
+        Thing.TABLE -> R.string.thing_table
+        Thing.CUP -> R.string.thing_cup
+        Thing.BOTTLE -> R.string.thing_bottle
+        Thing.BAG -> R.string.thing_bag
+        Thing.PHONE -> R.string.thing_phone
+        Thing.PERSON -> R.string.thing_person
+    }
+
+    fun place(p: Place): Int = when (p.side) {
+        Side.LEFT -> if (p.near) R.string.find_left_near else R.string.find_left
+        Side.AHEAD -> if (p.near) R.string.find_ahead_near else R.string.find_ahead
+        Side.RIGHT -> if (p.near) R.string.find_right_near else R.string.find_right
     }
 
     /** Reader.CHOICES by their Tesseract codes. */

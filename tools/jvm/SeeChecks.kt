@@ -1,4 +1,7 @@
+import com.layerbit.ikshana.engine.see.AskTurn
+import com.layerbit.ikshana.engine.see.Choice
 import com.layerbit.ikshana.engine.see.Describe
+import com.layerbit.ikshana.engine.see.Thing
 import com.layerbit.ikshana.engine.see.DescribePacer
 import com.layerbit.ikshana.engine.see.Find
 import com.layerbit.ikshana.engine.see.FrameGate
@@ -61,6 +64,23 @@ object SeeChecks : Suite {
         check(Find.place(doubleArrayOf(.1, .1, .9, .9)).near && !Find.place(doubleArrayOf(.45, .45, .55, .55)).near) { "near is big" }
         check(Find.saysAbsent("No.") && Find.saysAbsent("There is no bottle") && Find.saysAbsent("I can't see one")) { "absent" }
         check(!Find.saysAbsent("Yes, [1, 2, 3, 4]") && !Find.saysAbsent("Notebook [1,2,3,4]")) { "'Notebook' is not 'no'" }
+
+        check(Find.answer("No. [100, 100, 600, 600]") == null) { "absence is read before the box" }
+        check(Find.answer("It is on the table") == null) { "words without a box give no direction" }
+        check(Find.answer("[700, 300, 900, 500]")?.side == Side.RIGHT) { "a box is a place" }
+        check(Find.pattern(Find.place(doubleArrayOf(.1, .1, .9, .9))).totalMs > Find.pattern(Find.place(doubleArrayOf(.45, .45, .55, .55))).totalMs) { "near is felt longer than far" }
+        check(Thing.entries.map { it.id }.toSet().size == Thing.entries.size) { "thing ids unique" }
+
+        section("choosing without speaking")
+        val c = Choice(listOf(1, 2, 3))
+        check(c.current == 1 && c.next() == 2 && c.next() == 3 && c.next() == 1) { "the list wraps" }
+        val turn = AskTurn()
+        check(turn.take() == null) { "nothing asked, nothing taken" }
+        turn.choose(Question.COLOUR)
+        check(turn.waiting()) { "a chosen question waits" }
+        check(turn.take() == Question.COLOUR && turn.take() == null && !turn.waiting()) { "a question is answered once" }
+        turn.choose(Question.DOSE); turn.clear()
+        check(turn.take() == null) { "leaving Ask drops the question" }
 
         section("Ask and the prompts")
         check(Question.entries.map { it.id }.toSet().size == Question.entries.size) { "question ids unique" }

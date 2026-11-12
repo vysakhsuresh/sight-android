@@ -110,8 +110,10 @@ Describe, Find, Ask and Translate now say what they will do when chosen (`say_ab
   without preambles, Find's box-to-direction (no box, no direction), Ask's ready questions and
   the prompts. Decided by measurement-to-come rather than taste: llama.cpp is the first runtime
   tried (a vision model's LiteRT conversion is the long road); three openly licensed candidates
-  of 0.5, 1 and 2 billion parameters are downloaded for the laptop comparison on 60 VizWiz
-  photos (photos taken by blind people, with the question each asked). [~] Describe is wired end
+  of 0.5, 1 and 2 billion parameters are compared on the laptop on 11 of 60 VizWiz photos
+  (taken by blind people, with the question each asked) before the laptop ran short of memory:
+  the 0.5B invented people, the 2B twice invented a medicine's name, the 1B is chosen to try on
+  the phone first. [~] Describe is wired end
   to end: llama.cpp b12319 as a submodule built into `libikshana_vision.so` (arm64), the JNI
   bridge (`app/src/main/cpp/vision.cpp`), `VisionModel`, colour frames from `CameraDoor` only
   while Describe runs, `DescribePacer` (speaks again only when the scene changes), "Looking."
@@ -124,6 +126,12 @@ Describe, Find, Ask and Translate now say what they will do when chosen (`say_ab
 ## P4 — Find (v0.3)
 
 - [ ] 22. Localisation, `GuidanceChecks` (axes swapped as the negative test), the throttle.
+  **13 Nov:** [~] Find runs on the Describe model: eight ready things (a door, a chair, a table, a
+  cup, a bottle, a bag, a phone, a person) stepped by a swipe up, the button or TalkBack's action;
+  a place is said only from a box the model drew and did not deny (`Find.answer`), left, ahead or
+  right, "within reach" when the box is big, felt as a long pulse or a short tick (`SeeChecks`,
+  each fault seen failing). Built; **not seen on the phone** (`PENDING_TESTS` 13). Not yet: a
+  thing named by voice, buzzing that strengthens continuously as the hand closes in.
   **Release gate:** a door, a cup and a named bottle found in under 20 s each, display off.
 
 ## P5 — Translate (v0.4)
@@ -139,6 +147,10 @@ Describe, Find, Ask and Translate now say what they will do when chosen (`say_ab
   has no offline speech input, so an own offline recogniser comes with it, and with it
   RECORD_AUDIO, the first permission beyond CAMERA. Until then the six ready questions in
   `engine/see` (`Question`) are chosen by tap or swipe.
+  **13 Nov:** [~] Ask on the ready questions is wired: entering asks the first question of the
+  next clear frame; a swipe up, the on-screen button or TalkBack's "Next question" steps and
+  asks once (`AskTurn`, faults seen failing); the answer is cut as Describe's is. Built; **not
+  seen on the phone** (`PENDING_TESTS` 12). The seen/thought split is not built.
 
 ## P7 — Polish and release (v1.0)
 
