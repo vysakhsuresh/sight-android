@@ -1,0 +1,28 @@
+*.iml
+.gradle/
+.kotlin/
+/local.properties
+/.idea/
+.DS_Store
+/build
+/captures
+*.apk
+*.aab
+/app/build
+/app/.cxx
+/app/release
+/engine/build
+/tools/out
+__pycache__/
+
+# Real signing credentials - never commit these.
+/keystore.properties
+*.jks
+*.keystore
+
+# Models are built under tools/models and arrive by asset pack or the "full" APK, never by git.
+*.tflite
+*.onnx
+/tools/models/**/work/
+/tools/models/**/.venv/
+.claude/worktrees/
