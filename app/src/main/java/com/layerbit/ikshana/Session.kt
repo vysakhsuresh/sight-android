@@ -12,6 +12,8 @@ import com.layerbit.ikshana.engine.light.LightLevel
 import com.layerbit.ikshana.camera.CameraDoor
 import com.layerbit.ikshana.engine.mode.Hint
 import com.layerbit.ikshana.engine.read.NothingPacer
+import com.layerbit.ikshana.engine.money.Money
+import com.layerbit.ikshana.engine.money.MoneyVote
 import com.layerbit.ikshana.engine.read.ReadMemory
 import com.layerbit.ikshana.engine.read.ReadText
 import com.layerbit.ikshana.engine.read.Scripts
@@ -59,6 +61,10 @@ class Session(private val context: Context, val prefs: Prefs) {
     @Volatile var readLanguages: String = prefs.readLanguages; private set
     var readLanguagesShown: String by mutableStateOf(prefs.readLanguages); private set
     private val reader = Reader(context)
+    /** Its own reader, English only: notes print their value in Latin numerals, and one
+     *  language makes the recogniser faster and surer of digits than five would. */
+    private val moneyReader = Reader(context)
+    private val vote = MoneyVote()
     private val memory = ReadMemory()
     private val pacer = NothingPacer()
     private var lastLight = 0L
@@ -79,7 +85,7 @@ class Session(private val context: Context, val prefs: Prefs) {
             // it (DEVICE_FINDINGS says which: logged is not heard). Nothing here leaves the phone.
             is Effect.Say -> Labels.said(context, e.said).let { Log.i("IkshanaSay", it); voice.say(it) }
             is Effect.Sound -> { Log.i("IkshanaSay", "earcon ${e.earcon}"); feedback.play(e.earcon) }
-            is Effect.Run -> if (e.mode != before) { band = null; memory.clear() }
+            is Effect.Run -> if (e.mode != before) { band = null; memory.clear(); vote.clear() }
             Effect.OfferCameraDoors -> Unit // the screen shows them whenever the mode is Help
         }
         if (state.wanted.onRow) prefs.lastMode = state.wanted
@@ -101,6 +107,7 @@ class Session(private val context: Context, val prefs: Prefs) {
                 onLuma(LightLevel.meanLuma(f.y, f.width, f.height, f.rowStride))
             }
             Mode.READ -> readFrame(f)
+            Mode.MONEY -> moneyFrame(f)
             else -> Unit
         }
     }
@@ -123,6 +130,30 @@ class Session(private val context: Context, val prefs: Prefs) {
                 voice.say(line, Scripts.localeOf(line))
             }
             if (pacer.onRead(System.currentTimeMillis(), kept.isNotEmpty())) {
+                send(Event.NothingFound(if (LightLevel.bandOf(mean) == LightBand.DARK) Hint.TOO_DARK else Hint.NONE))
+            }
+        }
+    }
+
+    private fun moneyFrame(f: CameraDoor.Frame) {
+        if (!moneyReader.open("eng")) { send(Event.ModelFailed(Models.OCR_TESSERACT)); return }
+        val up = ReadText.rotate(f.y, f.width, f.height, f.rowStride, f.rotation)
+        val lines = try { moneyReader.read(up.bytes, up.width, up.height) } catch (e: Throwable) {
+            Log.w("Ikshana", "money read failed", e); send(Event.ModelFailed(Models.OCR_TESSERACT)); return
+        }
+        // Low-confidence lines still count here: a lone numeral is short and Tesseract is unsure
+        // of short lines, but the vote across frames is what guards against a wrong value.
+        val value = Money.valueOf(lines.map { it.text })
+        val mean = LightLevel.meanLuma(f.y, f.width, f.height, f.rowStride)
+        Log.i("IkshanaMoney", "frame read ${lines.map { it.text }} -> $value")
+        main.post {
+            if (activeNow != Mode.MONEY) return@post
+            val say = vote.onFrame(value)
+            if (say != null) {
+                Money.words(say).let { Log.i("IkshanaSay", it); voice.say(it) }
+                feedback.buzz(Money.pattern(say))
+            }
+            if (pacer.onRead(System.currentTimeMillis(), value != null)) {
                 send(Event.NothingFound(if (LightLevel.bandOf(mean) == LightBand.DARK) Hint.TOO_DARK else Hint.NONE))
             }
         }
@@ -164,6 +195,7 @@ class Session(private val context: Context, val prefs: Prefs) {
 
     fun close() {
         reader.close()
+        moneyReader.close()
         voice.shutdown()
         feedback.release()
     }

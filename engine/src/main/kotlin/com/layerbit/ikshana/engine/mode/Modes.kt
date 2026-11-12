@@ -72,7 +72,8 @@ object ModeTable {
      */
     val needs: Map<Mode, Needs> = mapOf(
         Mode.READ to Needs(true, listOf(ocr, ocrLite, setOf(Models.OCR_TESSERACT)), Mode.LIGHT),
-        Mode.MONEY to Needs(true, listOf(setOf(Models.CURRENCY)), Mode.READ),
+        // Interim tier: the note's printed value through the borrowed reader (engine/money).
+        Mode.MONEY to Needs(true, listOf(setOf(Models.CURRENCY), setOf(Models.OCR_TESSERACT)), Mode.READ),
         Mode.DESCRIBE to Needs(true, listOf(setOf(Models.VLM), setOf(Models.VLM_LITE)), Mode.READ),
         Mode.FIND to Needs(true, listOf(setOf(Models.VLM), setOf(Models.VLM_LITE)), Mode.DESCRIBE),
         Mode.TRANSLATE to Needs(

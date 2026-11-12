@@ -94,6 +94,13 @@ OCR replaces it by score.
 
 ## P3 — Money and Describe (v0.2)
 
+**Interim Money, at the owner's request (12 Nov):** the note's printed value read by the borrowed
+reader (English digits only), spoken only when two of the last three frames agree, and felt as a
+buzz pattern that differs for every note (`MoneyChecks`, each rule seen failing). Not a currency
+model: it reads numerals, so a folded note that hides them gives nothing, and it never judges a note
+genuine. Built, **not seen on a phone** (the phone left with the owner before it could be installed).
+Describe, Find, Ask and Translate now say what they will do when chosen (`say_about_*`).
+
 - [ ] 18. The currency set and CNN. Check: top-1 above 99% held out, every miss listed.
 - [ ] 19. The vision-language model, chosen by the harness, fine-tuned, converted (LiteRT or
   llama.cpp by measurement), checked against the reference run; the OCR/VLM swap designed for 4 GB.

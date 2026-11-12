@@ -10,6 +10,8 @@ object Registry {
         GestureChecks,
         EarconChecks,
         ReadTextChecks,
+        MoneyChecks,
+        VoiceChoiceChecks,
         RunnerChecks
     )
 }

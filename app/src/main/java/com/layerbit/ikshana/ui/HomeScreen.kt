@@ -31,6 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
@@ -74,7 +75,10 @@ fun HomeScreen(
     var settingsOpen by remember { mutableStateOf(false) }
     val activeName = stringResource(Labels.mode(state.active))
 
-    Box(Modifier.fillMaxSize().background(Ink.Background)) {
+    Box(
+        Modifier.fillMaxSize().background(Ink.Background)
+            .background(Brush.radialGradient(listOf(Ink.Nebula, Ink.Background), radius = 1600f))
+    ) {
         Column(Modifier.fillMaxSize().safeDrawingPadding()) {
             Box(Modifier.weight(1f).fillMaxWidth().padding(12.dp)) {
                 CameraSurface(session, activeName, camera)
@@ -103,7 +107,7 @@ private fun CameraSurface(session: Session, activeName: String, camera: @Composa
         Modifier
             .fillMaxSize()
             .clip(RoundedCornerShape(18.dp))
-            .border(3.dp, Ink.Iris, RoundedCornerShape(18.dp))
+            .border(3.dp, Brush.linearGradient(listOf(Ink.Iris, Ink.IrisDeep, Ink.Iris)), RoundedCornerShape(18.dp))
             .semantics {
                 contentDescription = description
                 if (session.paused) stateDescription = paused
@@ -222,8 +226,11 @@ private fun ModeGrid(session: Session) {
                     Box(
                         Modifier.weight(1f).heightIn(min = Target)
                             .clip(RoundedCornerShape(14.dp))
-                            .background(if (active) Ink.Iris else Ink.Surface)
-                            .border(1.dp, if (selected) Ink.Iris else Ink.Border, RoundedCornerShape(14.dp))
+                            .background(
+                                if (active) Brush.linearGradient(listOf(Ink.Iris, Ink.IrisDeep))
+                                else Brush.verticalGradient(listOf(Ink.Surface, Ink.SurfaceDim))
+                            )
+                            .border(if (selected) 2.dp else 1.dp, if (selected) Ink.Iris else Ink.Border, RoundedCornerShape(14.dp))
                             // Selectable, not clickable: the tint is the only mark of the chosen mode.
                             .selectable(selected = selected, role = Role.Tab) { session.send(Event.Choose(mode)) }
                             .semantics { stateDescription = state },

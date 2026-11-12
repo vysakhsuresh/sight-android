@@ -28,7 +28,8 @@ class Voice(context: Context, private val onUnavailable: (String) -> Unit) {
     private var failed = false
     private var paused = false
     private var current: Pair<String, String?>? = null
-    private var language: String? = null
+    /** The tag last set on the engine; a sentinel so the first line always chooses a voice. */
+    private var language: String? = "unset"
     var last: String? = null; private set
     private var lastTag: String? = null
     private val ids = AtomicInteger()
@@ -107,15 +108,42 @@ class Voice(context: Context, private val onUnavailable: (String) -> Unit) {
         if (tag != language) {
             // A line in a script the engine has no voice for is still said, in the phone's own
             // voice, rather than dropped: badly read is better than silent (docs/FALLBACKS.md).
-            val r = tts.setLanguage(if (tag == null) Locale.getDefault() else Locale.forLanguageTag(tag))
-            if (r == TextToSpeech.LANG_MISSING_DATA || r == TextToSpeech.LANG_NOT_SUPPORTED) {
-                android.util.Log.w("Ikshana", "no voice for $tag; using the phone's own")
-                tts.setLanguage(Locale.getDefault())
+            val locale = if (tag == null) Locale.getDefault() else Locale.forLanguageTag(tag)
+            if (!useBestVoice(locale)) {
+                val r = tts.setLanguage(locale)
+                if (r == TextToSpeech.LANG_MISSING_DATA || r == TextToSpeech.LANG_NOT_SUPPORTED) {
+                    android.util.Log.w("Ikshana", "no voice for $tag; using the phone's own")
+                    tts.setLanguage(Locale.getDefault())
+                }
             }
             language = tag
         }
         val r = tts.speak(text, TextToSpeech.QUEUE_ADD, null, "ik-${ids.incrementAndGet()}")
         if (r != TextToSpeech.SUCCESS) { current = null; onUnavailable(text) }
+    }
+
+    /**
+     * The phone's best offline voice for [locale] (VoiceChoice, executed by VoiceChoiceChecks),
+     * at the calmer rate. False when the engine lists none, and the caller sets the language.
+     */
+    private fun useBestVoice(locale: Locale): Boolean = try {
+        val infos = tts.voices.orEmpty().map { v ->
+            com.layerbit.ikshana.engine.read.VoiceInfo(
+                v.name, v.locale.language, v.locale.country, v.quality, v.latency, v.isNetworkConnectionRequired,
+                !v.features.orEmpty().contains(TextToSpeech.Engine.KEY_FEATURE_NOT_INSTALLED)
+            )
+        }
+        val tag = if (locale.country.isEmpty()) locale.language else "${locale.language}-${locale.country}"
+        val best = com.layerbit.ikshana.engine.read.VoiceChoice.pick(infos, tag)
+        val voice = tts.voices.orEmpty().firstOrNull { it.name == best?.name }
+        if (voice != null) {
+            tts.voice = voice
+            tts.setSpeechRate(com.layerbit.ikshana.engine.read.VoiceChoice.RATE)
+            android.util.Log.i("Ikshana", "voice for $tag: ${voice.name} (quality ${voice.quality})")
+            true
+        } else false
+    } catch (e: Throwable) {
+        android.util.Log.w("Ikshana", "voice list failed", e); false
     }
 
     fun shutdown() {

@@ -141,6 +141,13 @@ object FallbackChecks : Suite {
         // The P0 phone: no model in the pack yet. Read cannot run; Light can.
         var st = ModeMachine.step(State.initial(emptySet(), CameraState.GRANTED), Event.Started(Mode.READ, false))
         check(st.spoken == listOf(Said(Line.WELCOME), Said(Line.NOT_READY, listOf(Mode.READ, Mode.LIGHT)))) { "P0 start said ${st.spoken}" }
+        // Choosing an unbuilt mode says where you are and then what the mode will do.
+        val p0 = st.state
+        st = ModeMachine.step(p0, Event.Choose(Mode.TRANSLATE))
+        check(st.spoken == listOf(Said(Line.NOT_READY, listOf(Mode.TRANSLATE, Mode.LIGHT)), Said(Line.ABOUT_TRANSLATE))) { "translate: ${st.spoken}" }
+        // Money runs on the interim reader when only it is in the pack.
+        val interimOnly = ModeMachine.step(State.initial(setOf(Models.OCR_TESSERACT), CameraState.GRANTED), Event.Started(Mode.MONEY, false))
+        check(interimOnly.state.active == Mode.MONEY && interimOnly.spoken == listOf(Said(Line.WELCOME))) { "interim money: ${interimOnly.spoken}" }
         check(st.state.active == Mode.LIGHT) { "P0 start is in ${st.state.active}" }
         // Everything present: Money as asked.
         val full = ModeMachine.step(State.initial(all, CameraState.GRANTED), Event.Started(Mode.READ, false)).state

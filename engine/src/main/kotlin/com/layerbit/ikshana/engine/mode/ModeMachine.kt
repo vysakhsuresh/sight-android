@@ -203,6 +203,12 @@ object ModeMachine {
         effects += Effect.Run(land.mode, land.tier)
         if (land.mode == Mode.HELP) effects += Effect.OfferCameraDoors
         val step = sayOnce(state, said, earcon)
+        // A mode that is not built yet says what it will do, right after saying where you are.
+        val about = if (said.line == Line.NOT_READY) Line.about(said.modes[0]) else null
+        if (about != null && step.effects.any { it is Effect.Say }) {
+            val a = Said(about)
+            return Step(step.state.copy(lastSaid = a), effects + step.effects + Effect.Say(a))
+        }
         return Step(step.state, effects + step.effects)
     }
 

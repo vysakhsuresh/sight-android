@@ -40,7 +40,13 @@ plays with it.
 |---|---|---|---|
 | `say_welcome` | the app opens | — | Ikshana. |
 | `say_mode_on` | a mode comes on as asked | mode | %1$s. |
-| `say_not_ready` | the asked mode's model is not in this install | fallback | %1$s is not on this phone yet. %2$s is on instead. |
+| `say_not_ready` | the asked mode's model is not in this install; followed by what the mode does | fallback | %1$s is not ready yet. %2$s is on. |
+| `say_about_read` | after `say_not_ready` for that mode | — | Read speaks any text the camera sees: signs, pages, medicine strips. |
+| `say_about_money` | after `say_not_ready` for that mode | — | Money tells you the value of an Indian note. Hold the note flat, a hand's length away. |
+| `say_about_describe` | after `say_not_ready` for that mode | — | Describe will tell you what is in front of you. It is still being built. |
+| `say_about_find` | after `say_not_ready` for that mode | — | Find will lead you to a door, a cup, or anything you name, buzzing stronger as you get close. It is still being built. |
+| `say_about_translate` | after `say_not_ready` for that mode | — | Translate will read a sign in one Indian language and speak it in yours, like a Kannada board in Malayalam. It is still being built. |
+| `say_about_ask` | after `say_not_ready` for that mode | — | Ask will answer your question about what the camera sees. It is still being built. |
 | `say_could_not_start` | the asked mode's model is present but failed to load, ran out of memory, or failed its self-check | fallback | %1$s could not start. %2$s is on instead. |
 | `say_lighter` | the full model failed or measured too heavy; the lighter twin runs | fallback | %1$s is on, with the lighter model this phone can carry. |
 | `say_no_camera` | camera permission denied (or never granted) and no picture picked: lands in Help, both doors on screen | fallback | Ikshana cannot use the camera. To allow it, open Settings, then Apps, Ikshana, Permissions, Camera. Or pick a picture from the gallery. |

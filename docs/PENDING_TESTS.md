@@ -13,6 +13,12 @@ own data (Ikshana keeps none yet).
    (default), then each other language from Settings, Reading. Seen when the right words are
    heard in the right voice and no line is said twice while the phone sweeps. Log
    `IkshanaRead` for the time per frame. Then a bus board outdoors.
+0b. **Money, interim:** hold a ₹10, ₹20, ₹50, ₹100, ₹200, ₹500 and ₹2000 flat at a hand's length,
+   front and back, in room light. Seen when each is said once, correctly, with its buzz, and a
+   card with "500" in a price on it is not called a note (it will be: numerals are all it reads;
+   write down how often). Log `IkshanaMoney`.
+0c. **The new voice and words:** `Ikshana: voice for …` in the log names the voice chosen per
+   language; choosing Translate says what Translate will do.
 1. **Hear the start and the light level** on the moto: "Ikshana.", the fallback sentence, then
    one light band and **no** "Dark." in a lit room (the 1.5 s settle). Cover the lens: "Dark."
    once; uncover: one band, no flicker between bands while the phone is still.

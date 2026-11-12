@@ -88,6 +88,17 @@ class FeedbackPlayer(context: Context, private val earconsOn: () -> Boolean, pri
         }
     }
 
+    /** A pattern with no tone (Money's value, felt): haptics only, and only if switched on. */
+    fun buzz(p: com.layerbit.ikshana.engine.feedback.Pattern) {
+        if (!hapticsOn()) return
+        val v = vibrator ?: return
+        try {
+            if (v.hasVibrator()) v.vibrate(VibrationEffect.createWaveform(p.timingsMs, p.amplitudes.map { if (it > 0) 255 else 0 }.toIntArray(), -1))
+        } catch (t: Throwable) {
+            Log.w("Ikshana", "pattern could not play", t)
+        }
+    }
+
     fun release() {
         tracks.values.forEach { runCatching { it.release() } }
         tracks.clear()

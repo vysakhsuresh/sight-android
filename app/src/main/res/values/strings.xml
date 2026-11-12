@@ -19,7 +19,7 @@
     -->
     <string name="say_welcome">Ikshana.</string>
     <string name="say_mode_on">%1$s.</string>
-    <string name="say_not_ready">%1$s is not on this phone yet. %2$s is on instead.</string>
+    <string name="say_not_ready">%1$s is not ready yet. %2$s is on.</string>
     <string name="say_could_not_start">%1$s could not start. %2$s is on instead.</string>
     <string name="say_lighter">%1$s is on, with the lighter model this phone can carry.</string>
     <string name="say_no_camera">Ikshana cannot use the camera. To allow it, open Settings, then Apps, Ikshana, Permissions, Camera. Or pick a picture from the gallery.</string>
@@ -34,6 +34,13 @@
     <string name="say_warm">The phone is warm. Ikshana is slowing down to cool it.</string>
     <string name="say_cool">The phone has cooled. Back to full speed.</string>
     <string name="say_too_long">%1$s is taking too long. Hold still and try again.</string>
+
+    <string name="say_about_read">Read speaks any text the camera sees: signs, pages, medicine strips.</string>
+    <string name="say_about_money">Money tells you the value of an Indian note. Hold the note flat, a hand\'s length away.</string>
+    <string name="say_about_describe">Describe will tell you what is in front of you. It is still being built.</string>
+    <string name="say_about_find">Find will lead you to a door, a cup, or anything you name, buzzing stronger as you get close. It is still being built.</string>
+    <string name="say_about_translate">Translate will read a sign in one Indian language and speak it in yours, like a Kannada board in Malayalam. It is still being built.</string>
+    <string name="say_about_ask">Ask will answer your question about what the camera sees. It is still being built.</string>
 
     <!-- Light level, by LightBand.id: spoken when the band changes. -->
     <string name="light_dark">Dark.</string>

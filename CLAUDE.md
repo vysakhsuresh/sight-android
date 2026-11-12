@@ -100,6 +100,12 @@ must end at Help.
 
 ## Things the first day taught (12 November), for the next stranger
 
+- **The owner tests on the phone as soon as a build lands and judges by what is spoken.** A mode
+  that only says "not ready" reads as broken; every unbuilt mode now says what it will do. The
+  owner rejected the almond-eye icon ("no eyelid"); the mark is the beam into a black hole.
+- **Interim models are allowed when the owner asks for function now**, if labelled borrowed and
+  placed as the last tier so ours replace them by score.
+
 - **The setup command ran `git init` in the home folder**, because the `cd` into an empty
   project folder did not hold. `C:\Users\vysak\.git` (with this repo's remote) was moved into the
   project. If `git rev-parse --show-toplevel` ever says `C:/Users/vysak`, stop and look.

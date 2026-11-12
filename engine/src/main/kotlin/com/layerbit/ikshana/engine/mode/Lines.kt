@@ -15,7 +15,7 @@ package com.layerbit.ikshana.engine.mode
 enum class Line(val id: String, val modes: Int, val english: String) {
     WELCOME("welcome", 0, "Ikshana."),
     MODE_ON("mode_on", 1, "%1\$s."),
-    NOT_READY("not_ready", 2, "%1\$s is not on this phone yet. %2\$s is on instead."),
+    NOT_READY("not_ready", 2, "%1\$s is not ready yet. %2\$s is on."),
     COULD_NOT_START("could_not_start", 2, "%1\$s could not start. %2\$s is on instead."),
     LIGHTER("lighter", 1, "%1\$s is on, with the lighter model this phone can carry."),
     NO_CAMERA(
@@ -32,10 +32,25 @@ enum class Line(val id: String, val modes: Int, val english: String) {
     RESTARTED("restarted", 1, "Ikshana restarted. %1\$s is on. Say it again."),
     WARM("warm", 0, "The phone is warm. Ikshana is slowing down to cool it."),
     COOL("cool", 0, "The phone has cooled. Back to full speed."),
-    TOO_LONG("too_long", 1, "%1\$s is taking too long. Hold still and try again.");
+    TOO_LONG("too_long", 1, "%1\$s is taking too long. Hold still and try again."),
+    // What each mode does, said after "not ready yet" so nobody is left guessing what a
+    // button is for (owner, 12 Nov: "if I cannot understand what Translate translates, how
+    // will a visually impaired man?").
+    ABOUT_READ("about_read", 0, "Read speaks any text the camera sees: signs, pages, medicine strips."),
+    ABOUT_MONEY("about_money", 0, "Money tells you the value of an Indian note. Hold the note flat, a hand's length away."),
+    ABOUT_DESCRIBE("about_describe", 0, "Describe will tell you what is in front of you. It is still being built."),
+    ABOUT_FIND("about_find", 0, "Find will lead you to a door, a cup, or anything you name, buzzing stronger as you get close. It is still being built."),
+    ABOUT_TRANSLATE("about_translate", 0, "Translate will read a sign in one Indian language and speak it in yours, like a Kannada board in Malayalam. It is still being built."),
+    ABOUT_ASK("about_ask", 0, "Ask will answer your question about what the camera sees. It is still being built.");
 
     companion object {
         fun byId(id: String): Line? = entries.firstOrNull { it.id == id }
+
+        fun about(mode: Mode): Line? = when (mode) {
+            Mode.READ -> ABOUT_READ; Mode.MONEY -> ABOUT_MONEY; Mode.DESCRIBE -> ABOUT_DESCRIBE
+            Mode.FIND -> ABOUT_FIND; Mode.TRANSLATE -> ABOUT_TRANSLATE; Mode.ASK -> ABOUT_ASK
+            else -> null
+        }
     }
 }
 

@@ -29,13 +29,19 @@ import com.layerbit.ikshana.R
  * light theme) arrives with the low-vision mode in P7, where it is measured, not guessed.
  */
 object Ink {
-    val Background = Color(0xFF070A12)
-    val Surface = Color(0xFF121828)
-    val SurfaceDim = Color(0xFF0C1120)
-    val Border = Color(0xFF1F2940)
-    val BorderStrong = Color(0xFF35425F)
-    val Text = Color(0xFFF6F7FB)
-    val Muted = Color(0xFFA8B3C9)
+    // Regraded 12 Nov at the owner's word ("it looks like an old cloth"): the field is the black
+    // of the icon's horizon, panels are glass with a cold blue cast, and the one light is Iris.
+    val Background = Color(0xFF010205)
+    val Surface = Color(0xFF0A1226)
+    val SurfaceDim = Color(0xFF060B18)
+    val Border = Color(0xFF16284D)
+    val BorderStrong = Color(0xFF2A4A85)
+    val Text = Color(0xFFF4F8FF)
+    val Muted = Color(0xFF9FB4D9)
+    /** The deep end of the Iris beam, for gradients from Iris into the dark. */
+    val IrisDeep = Color(0xFF2F6BFF)
+    /** The nebula behind everything: Iris at a whisper. */
+    val Nebula = Color(0xFF0B2350)
     /** Iris on ink, `#6FD3FF` (brief, section 4). */
     val Iris = Color(0xFF6FD3FF)
     val OnIris = Color(0xFF00131D)

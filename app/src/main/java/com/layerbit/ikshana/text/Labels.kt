@@ -42,6 +42,12 @@ object Labels {
         Line.WARM -> R.string.say_warm
         Line.COOL -> R.string.say_cool
         Line.TOO_LONG -> R.string.say_too_long
+        Line.ABOUT_READ -> R.string.say_about_read
+        Line.ABOUT_MONEY -> R.string.say_about_money
+        Line.ABOUT_DESCRIBE -> R.string.say_about_describe
+        Line.ABOUT_FIND -> R.string.say_about_find
+        Line.ABOUT_TRANSLATE -> R.string.say_about_translate
+        Line.ABOUT_ASK -> R.string.say_about_ask
     }
 
     fun light(b: LightBand): Int = when (b) {

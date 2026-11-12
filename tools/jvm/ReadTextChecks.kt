@@ -62,3 +62,4 @@ object ReadTextChecks : Suite {
         check(!pacer.onRead(31_000, false) && pacer.onRead(35_000, false)) { "text resets the wait" }
     }
 }
+

@@ -19,7 +19,8 @@ the harness and the Ikshana set (P1) do not exist yet; that is the first number 
 |---|---|---|---|---|
 | `ocr.tesseract` (mal+eng loaded; hin, tam, kan, tel available) | **borrowed, interim**: not ours, not fine-tuned | none yet (P1) | moto g84, 12 Nov: 350-530 ms a frame at 960 x 1280, LSTM only, on the analysis thread (logged, on a frame with no text) | 20.1 MB for six languages |
 
-Every other mode that needs a model falls to Read now, by the chain in `docs/FALLBACKS.md`.
+Money runs on the same borrowed reader, English only, through `engine/money` (fully ours rules; the
+numbers are read by the borrowed model). Every other mode that needs a model falls to Read now, by the chain in `docs/FALLBACKS.md`.
 
 The pure-arithmetic pieces that do the work of a model in P0 are executed, not scored:
 

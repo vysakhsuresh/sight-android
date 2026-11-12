@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Builds every Ikshana icon asset from one drawing: the black-hole eye (owner, 12 Nov 2026).
+"""Builds every Ikshana icon asset from one drawing: the beam into the black hole (owner, 12 Nov).
 
-The owner asked for the iris redrawn as "a black hole iris combination": the earlier blue eye
-with HUD arcs read as a local app. The mark is now a black hole seen as an eye. The pupil is an
-event horizon (true black) inside a white-hot photon ring; the iris is the accretion disk, 260
-spiral streams of Iris blue falling inward, brighter on the left as a real disk is (Doppler
-beaming); the almond of the eye is two luminous streams meeting at the corners; and a thin front
-disk crosses the lower edge of the hole, the signature every picture of a black hole carries.
+Second redraw the same day. The owner rejected the almond eye ("I don't want the eyelid") and
+asked for the iris and the black hole as one thing, "a deep immersive beam going to the universe
+when looked from the centre of its flight". So the mark is seen from inside the beam: Iris-blue
+streaks of light rush inward in a slight spiral (the iris's fibres and starlight stretched by
+speed at once), rings recede down the tunnel in perspective, and at its end the pupil is a black
+hole with a white-hot photon ring. No outline, no lid: the whole tile is the eye.
 Generated, not traced. The same geometry, drawn once here, becomes:
 
   app/src/main/res/mipmap-*/ic_launcher_foreground.png   adaptive foreground (the art,
@@ -28,7 +28,7 @@ The SVG and XML need only Python. The PNGs need Node with Playwright and a Chrom
 Why rasters for the adaptive layers and not a vector: a VectorDrawable with 320 gradient
 strokes is slow to inflate on every launcher redraw, and the fibres are the icon. The
 themed icon and the notification glyph are vectors because they must be, and they carry a
-simplified mark (almond, photon ring, horizon) that reads at 24 dp.
+simplified mark (rings down the beam, the horizon) that reads at 24 dp.
 """
 import json, math, os, random, subprocess, sys
 
@@ -46,7 +46,7 @@ SAFE = 33 / 46
 BLUES = ["#E6F7FF", "#BDE9FF", "#6FD3FF", "#2FA8FF", "#1E7FE0"]
 DEEP = ["#0B57B8", "#083A7A", "#1E7FE0"]
 R = 30     # outer edge of the accretion disk (the iris)
-H = 15.5   # event horizon (the pupil)
+H = 11     # event horizon (the pupil), small: far down the beam
 
 
 def swirl(n, r0, r1, cols, seed, twist=0.9, wmin=.35, wmax=.9):
@@ -84,44 +84,55 @@ def stars(n, seed):
     return "".join(out)
 
 
-def arc_d(r, a0, a1, ry=None):
-    ry = r if ry is None else ry
-    x0, y0 = 54 + r * math.cos(a0), 54 + ry * math.sin(a0)
-    x1, y1 = 54 + r * math.cos(a1), 54 + ry * math.sin(a1)
-    large = 1 if (a1 - a0) > math.pi + 1e-9 else 0
-    return f"M{x0:.2f},{y0:.2f} A{r},{ry} 0 {large} 1 {x1:.2f},{y1:.2f}"
+def streaks(n, seed):
+    """Light rushing inward: each streak runs from far out toward the horizon, turning slightly
+    (the spiral of a vortex), brighter and wider at its outer end, so the eye reads depth."""
+    random.seed(seed)
+    out = []
+    for i in range(n):
+        a = 2 * math.pi * random.random()
+        r_out = random.uniform(24, 62)
+        r_in = max(H + 2.5, r_out * random.uniform(.28, .6))
+        tw = .35 * (r_out - r_in) / 40
+        x0, y0 = 54 + r_out * math.cos(a), 54 + r_out * math.sin(a)
+        x1, y1 = 54 + r_in * math.cos(a + tw), 54 + r_in * math.sin(a + tw)
+        g = f"s{i}"
+        col = random.choice(BLUES)
+        op = random.uniform(.35, .95)
+        out.append(f'<linearGradient id="{g}" gradientUnits="userSpaceOnUse" x1="{x0:.2f}" y1="{y0:.2f}" x2="{x1:.2f}" y2="{y1:.2f}">'
+                   f'<stop offset="0" stop-color="{col}" stop-opacity="{op:.2f}"/><stop offset="1" stop-color="{col}" stop-opacity="0"/></linearGradient>'
+                   f'<path d="M{x0:.2f},{y0:.2f} L{x1:.2f},{y1:.2f}" stroke="url(#{g})" stroke-width="{random.uniform(.3, 1.3) * r_out / 40:.2f}" stroke-linecap="round"/>')
+    return "".join(out)
 
 
-ALMOND = "M7,54 C26,22 82,22 101,54 C82,86 26,86 7,54 Z"
+def tunnel(k, ratio=.8):
+    """Rings receding down the beam: each one ratio times the last, fainter as it nears the hole."""
+    out, r, i = [], 52.0, 0
+    while r > H + 1.5 and i < k:
+        op = .08 + .32 * (r / 52)
+        out.append(f'<circle cx="54" cy="54" r="{r:.2f}" fill="none" stroke="#6FD3FF" stroke-width="{.25 + .5 * r / 52:.2f}" opacity="{op:.2f}"/>')
+        r *= ratio; i += 1
+    return "".join(out)
+
 
 DEFS = f"""<defs>
-<radialGradient id="bg" cx="50%" cy="50%" r="72%"><stop offset="0" stop-color="#071226"/><stop offset=".55" stop-color="#03070F"/><stop offset="1" stop-color="#010205"/></radialGradient>
-<radialGradient id="sclera" cx="50%" cy="50%" r="50%"><stop offset=".3" stop-color="#0B2A55" stop-opacity=".55"/><stop offset="1" stop-color="#0B2A55" stop-opacity="0"/></radialGradient>
-<radialGradient id="disk" cx="50%" cy="50%" r="50%"><stop offset=".5" stop-color="#1E7FE0" stop-opacity="0"/><stop offset=".62" stop-color="#2FA8FF" stop-opacity=".55"/><stop offset=".8" stop-color="#0B57B8" stop-opacity=".35"/><stop offset="1" stop-color="#062A5C" stop-opacity="0"/></radialGradient>
-<linearGradient id="beam" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".35" stop-color="#BDE9FF"/><stop offset=".7" stop-color="#2FA8FF"/><stop offset="1" stop-color="#0B57B8"/></linearGradient>
-<linearGradient id="lid" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6FD3FF" stop-opacity=".2"/><stop offset=".3" stop-color="#BDE9FF"/><stop offset=".7" stop-color="#6FD3FF"/><stop offset="1" stop-color="#2FA8FF" stop-opacity=".2"/></linearGradient>
-<clipPath id="eye"><path d="{ALMOND}"/></clipPath>
+<radialGradient id="bg" cx="50%" cy="50%" r="72%"><stop offset="0" stop-color="#0D2A66"/><stop offset=".35" stop-color="#061433"/><stop offset=".75" stop-color="#020611"/><stop offset="1" stop-color="#000"/></radialGradient>
+<radialGradient id="core" cx="50%" cy="50%" r="50%"><stop offset=".45" stop-color="#6FD3FF" stop-opacity="0"/><stop offset=".62" stop-color="#9FDBFF" stop-opacity=".9"/><stop offset=".75" stop-color="#2FA8FF" stop-opacity=".45"/><stop offset="1" stop-color="#1E7FE0" stop-opacity="0"/></radialGradient>
 <filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.6"/></filter>
-<filter id="haze" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3.2"/></filter>
+<filter id="haze" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter>
 </defs>"""
 
-BACKGROUND = '<rect width="108" height="108" fill="url(#bg)"/>' + stars(26, 11)
+BACKGROUND = '<rect width="108" height="108" fill="url(#bg)"/>'
 
 ART = (
-    f'<path d="{ALMOND}" fill="url(#sclera)"/>'
-    f'<path d="{ALMOND}" fill="none" stroke="#2FA8FF" stroke-width="3" opacity=".45" filter="url(#haze)"/>'
-    f'<path d="{ALMOND}" fill="none" stroke="url(#lid)" stroke-width="1.5"/>'
-    '<g clip-path="url(#eye)">'
-    f'<circle cx="54" cy="54" r="{R + 4}" fill="url(#disk)"/>'
-    f'<path d="{arc_d(40, math.pi, 2 * math.pi, 7)}" fill="none" stroke="url(#beam)" stroke-width="2" opacity=".55"/>'
-    + swirl(190, H + .5, R, BLUES, 3) + swirl(70, H + 2, R - 2, DEEP, 9, 1.3, .6, 1.2) +
-    f'<circle cx="54" cy="54" r="{H + 1.6}" fill="none" stroke="#9FDBFF" stroke-width="3.2" opacity=".6" filter="url(#glow)"/>'
-    f'<circle cx="54" cy="54" r="{H + .9}" fill="none" stroke="#F2FBFF" stroke-width="1.1"/>'
-    f'<circle cx="54" cy="54" r="{H}" fill="#000"/>'
-    f'<path d="{arc_d(40, 0, math.pi, 7)}" fill="none" stroke="#6FD3FF" stroke-width="3.4" opacity=".35" filter="url(#glow)"/>'
-    f'<path d="{arc_d(40, 0, math.pi, 7)}" fill="none" stroke="url(#beam)" stroke-width="1.6"/>'
-    '</g>'
-    '<ellipse cx="45.5" cy="44" rx="3.2" ry="1.9" fill="#fff" opacity=".85" transform="rotate(-30 45.5 44)"/>'
+    tunnel(9)
+    + streaks(170, 5)
+    # the light piling up at the edge of the horizon, then the white-hot photon ring
+    + f'<circle cx="54" cy="54" r="{H * 1.9:.2f}" fill="url(#core)" filter="url(#haze)"/>'
+    + f'<circle cx="54" cy="54" r="{H + 1.4}" fill="none" stroke="#BDE9FF" stroke-width="3" opacity=".7" filter="url(#glow)"/>'
+    + f'<circle cx="54" cy="54" r="{H + .8}" fill="none" stroke="#FFFFFF" stroke-width="1.1"/>'
+    # the pupil: the horizon, true black
+    + f'<circle cx="54" cy="54" r="{H}" fill="#000"/>'
 )
 
 
@@ -146,23 +157,17 @@ def write(path, text):
 
 # ---- vectors: the simplified mark for the themed icon and the status bar ----------------
 def mark_paths(k, colour):
-    """The almond, the photon ring and the horizon, scaled by k about the centre, one colour."""
-    def s(v):
-        return 54 + (v - 54) * k
-
-    def pt(x, y):
-        return f"{s(x):.2f},{s(y):.2f}"
-    almond = (f'<path android:pathData="M{pt(7, 54)} C{pt(26, 22)} {pt(82, 22)} {pt(101, 54)} '
-              f'C{pt(82, 86)} {pt(26, 86)} {pt(7, 54)} Z" android:strokeColor="{colour}" '
-              f'android:strokeWidth="{4 * k:.2f}" android:fillColor="#00000000"/>')
-    rr = (H + 3.5) * k
-    ring = (f'<path android:pathData="M{54 - rr:.2f},54 a{rr:.2f},{rr:.2f} 0 1,0 {2 * rr:.2f},0 '
-            f'a{rr:.2f},{rr:.2f} 0 1,0 {-2 * rr:.2f},0" android:strokeColor="{colour}" '
-            f'android:strokeWidth="{3 * k:.2f}" android:fillColor="#00000000"/>')
-    rh = H * .8 * k
-    hole = (f'<path android:pathData="M{54 - rh:.2f},54 a{rh:.2f},{rh:.2f} 0 1,0 {2 * rh:.2f},0 '
+    """Three rings down the beam and the horizon, scaled by k about the centre, one colour."""
+    out = ""
+    for r, w in ((44, 3.2), (31, 3.0), (H + 4, 3.0)):
+        rr = r * k
+        out += (f'<path android:pathData="M{54 - rr:.2f},54 a{rr:.2f},{rr:.2f} 0 1,0 {2 * rr:.2f},0 '
+                f'a{rr:.2f},{rr:.2f} 0 1,0 {-2 * rr:.2f},0" android:strokeColor="{colour}" '
+                f'android:strokeWidth="{w * k:.2f}" android:fillColor="#00000000"/>')
+    rh = H * k
+    out += (f'<path android:pathData="M{54 - rh:.2f},54 a{rh:.2f},{rh:.2f} 0 1,0 {2 * rh:.2f},0 '
             f'a{rh:.2f},{rh:.2f} 0 1,0 {-2 * rh:.2f},0" android:fillColor="{colour}"/>')
-    return almond + ring + hole
+    return out
 
 
 VECTOR_HEAD = ('<?xml version="1.0" encoding="utf-8"?>\n<vector xmlns:android="http://schemas.android.com/apk/res/android"\n'
