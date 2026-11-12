@@ -35,7 +35,7 @@ and the second belongs on Play to a coaching brand with millions of installs. A 
 | Package | `com.layerbit.ikshana` |
 | Repo | `vysakhsuresh/ikshana-android` |
 | Tagline | A camera that answers, and cannot upload what it sees. |
-| Icon | An open eye drawn as one unbroken line, the iris a single Iris-blue dot, on the family's ink. |
+| Icon | The blue eye: a sharp iris of generated fibres with a cyan aura and two HUD arcs, on near-black (`store-assets/icon/build_icon.py` builds every asset from it). |
 
 Runners-up if Ikshana is ever blocked: **Pratyaksha** (direct perception, nothing in
 between; long), **Nokku** (Malayalam, "look"; local).
@@ -165,6 +165,22 @@ Everything below runs on the phone. The APK does not declare INTERNET.
   always says what it saw before it says what it thinks.
 
 ### Pillar F — Trust, shell and finish (the family's edge)
+- **It never goes silent.** The owner's rule, written here as the first law of the app: there
+  is nothing Ikshana stops responding to. Every mode has a fallback below it, and the
+  fallback below the last one is a spoken sentence that says what was tried and what to do
+  next. The vision model fails to load: Read and Money still work. OCR finds nothing: the
+  app says so and says "move closer" or "more light", never nothing. The camera is denied:
+  the app speaks how to allow it and offers the gallery. The phone is too small for a model:
+  the smaller model in the pack takes over and says it is the lighter one. A crash is caught,
+  spoken ("Ikshana restarted; say it again"), and the mode comes back where it was. A blind
+  person holding a phone that has gone quiet is the one outcome this app is built to make
+  impossible, and `docs/FALLBACKS.md` lists every failure and what is spoken for it.
+- **Size is not a constraint; capability offline is.** The owner's decision: the app carries
+  the best models that run on the phone, not the smallest that fit a download. The base pack
+  is what Play's asset-pack limits allow, the GitHub "full" APK carries everything, and the
+  listing says the size plainly and why. A larger OCR for every one of the 22 scheduled
+  scripts, a larger vision model where the phone can run it, and the smaller twins beside them
+  for phones that cannot, chosen at first run by measurement.
 - No account, no counter, no subscription, no ads, **no INTERNET permission**;
   `tools/verify_manifest.py` fails CI if it ever appears. Camera is the one permission
   the app asks for; no location, no contacts, no storage.
@@ -356,6 +372,11 @@ the moto g84 and, from P2 on, a 4 GB phone beside it.
 ---
 
 ## 6. The command for the laptop CLI
+
+**The current command is `docs/LAPTOP_COMMAND.txt`**, which carries the owner's three
+rules (dependable enough to be honoured, never silent, size is no constraint) and the
+laptop's paths. The text below is the version this brief was written with; where the two
+differ, the file wins.
 
 Paste everything inside the fence into Claude Code on the laptop, from an empty folder,
 after checking that `stave-android`, `squish-android`, `layerbit-image-editor-android`,

@@ -1,0 +1,9 @@
+<svg viewBox="0 0 108 108" width="108" height="108" xmlns="http://www.w3.org/2000/svg"><defs>
+<radialGradient id="bg" cx="50%" cy="50%" r="72%"><stop offset="0" stop-color="#0A1830"/><stop offset=".6" stop-color="#050B18"/><stop offset="1" stop-color="#02050C"/></radialGradient>
+<radialGradient id="iris" cx="40%" cy="36%" r="70%"><stop offset="0" stop-color="#7FD6FF"/><stop offset=".38" stop-color="#1F86E8"/><stop offset=".72" stop-color="#0A3F96"/><stop offset="1" stop-color="#041C4A"/></radialGradient>
+<radialGradient id="pupil" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#000"/><stop offset=".78" stop-color="#010913"/><stop offset="1" stop-color="#0A3F96"/></radialGradient>
+<radialGradient id="aura" cx="50%" cy="50%" r="50%"><stop offset=".58" stop-color="#2FA8FF" stop-opacity="0"/><stop offset=".72" stop-color="#2FA8FF" stop-opacity=".38"/><stop offset=".86" stop-color="#2FA8FF" stop-opacity=".12"/><stop offset="1" stop-color="#2FA8FF" stop-opacity="0"/></radialGradient>
+<radialGradient id="gloss" cx="35%" cy="28%" r="60%"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".5" stop-color="#fff" stop-opacity=".06"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+<clipPath id="clip"><circle cx="54" cy="54" r="27"/></clipPath>
+<filter id="blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.4"/></filter>
+</defs><rect width="108" height="108" fill="url(#bg)"/></svg>

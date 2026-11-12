@@ -1,0 +1,208 @@
+Ikshana — the command for Claude Code on the laptop
+=====================================================
+
+Open Git Bash. Then:
+
+    cd /c/Users/vysak/StudioProjects/ikshana-android
+    git init 2>/dev/null; git remote add origin https://github.com/vysakhsuresh/ikshana-android.git 2>/dev/null
+    git fetch origin
+    git checkout -B main origin/main 2>/dev/null || git checkout -b main
+    git merge --ff-only origin/claude/vibrant-mendel-gdnoy5 || git merge origin/claude/vibrant-mendel-gdnoy5
+    git push -u origin main
+    cd .. && for r in stave-android squish-android layerbit-image-editor-android sheaf-android deja-android; do [ -d $r ] || git clone https://github.com/vysakhsuresh/$r.git; done
+    cd ikshana-android && claude
+
+Then paste everything between the two lines of equals signs into Claude Code.
+
+================================================================================
+You are building Ikshana, an open-source Android app that points a camera at the world
+and answers, on the phone, for people who cannot see well first and everyone second. The
+repository is github.com/vysakhsuresh/ikshana-android and this folder,
+C:\Users\vysak\StudioProjects\ikshana-android, is its clone. Read every word of this
+before touching a file.
+
+== WHO YOU ARE WORKING FOR ==
+The owner builds a family of Android apps that do the whole job on the phone and upload
+nothing: Squish (video, ../squish-android), Still (pictures,
+../layerbit-image-editor-android), Sheaf (PDF, ../sheaf-android), Stave (audio,
+../stave-android), Deja (screenshots, ../deja-android), LayerLink and Kshana. Ikshana is
+the camera that answers. Every tool is free, forever, with no account, no counter, no ad
+and no subscription. The reason to believe that is the repository: the app does not
+declare the INTERNET permission.
+
+== THE THREE RULES THE OWNER SET, ABOVE EVERYTHING ELSE ==
+1. DEPENDABLE ENOUGH TO BE HONOURED. This app is being built to be the most dependable
+   thing a blind person in India owns, good enough that the country notices. That is not
+   a slogan to put on a screen; it is the standard for every decision. When a shortcut
+   and the right way differ, take the right way and write down why. When a feature cannot
+   be made dependable, it is not shipped, and the roadmap says so.
+2. IT NEVER GOES SILENT. There is nothing Ikshana stops responding to. Every mode has a
+   fallback below it, and the last fallback is always a spoken sentence saying what was
+   tried and what to do next. A model fails to load: the mode below it works. Nothing is
+   found: the app says so and says what to change ("move closer", "more light"). The
+   camera is denied: it speaks how to allow it and offers the gallery. The phone is too
+   small for a model: the lighter twin takes over and says so. A crash is caught, spoken
+   ("Ikshana restarted, say it again"), and the mode returns where it was. A blind person
+   holding a phone that has gone quiet is the one outcome this app exists to make
+   impossible. docs/FALLBACKS.md lists every failure and the sentence spoken for it, and
+   a suite (FallbackChecks) proves every path in the engine's state machine ends in speech.
+3. SIZE IS NOT A CONSTRAINT; CAPABILITY OFFLINE IS. Carry the best models that run on the
+   phone, not the smallest that fit a download. The Play build takes what asset packs
+   allow; the GitHub "full" APK carries everything; the listing states the size and why.
+   Scripts, languages and modes are added until the scope is universal: all 22 scheduled
+   Indian languages' scripts for Read, then the world's major scripts; Malayalam, Hindi,
+   Tamil, then every Indian language with an open voice; and every mode a blind person
+   asks for in testing. Phones that cannot carry the large models get the lighter twins,
+   chosen at first run by measurement, never by refusing.
+
+== THE MISSION ==
+Beat Google Lookout and Gemini's Guided Vision, Microsoft Seeing AI, Be My Eyes and
+Envision on the phone, offline, in Indian languages before English, built for the blind
+with the display off. The brief is docs/IKSHANA_BRIEF.md in this repository; read it whole
+before planning. Its section 5 is the work order and docs/ROADMAP.md is its checklist.
+The icon is done: store-assets/icon/build_icon.py builds every launcher and store asset
+from one drawing, and app/src/main/res already holds them; keep them, and when the :app
+module is created, point the manifest at @mipmap/ic_launcher and @mipmap/ic_launcher_round.
+
+== SETUP, ONCE ==
+1. You are in the clone. All work lands on main and is pushed; no long-lived branches.
+   If the branch claude/vibrant-mendel-gdnoy5 is not yet merged into main, merge it first.
+2. Beside this folder, ../stave-android, ../squish-android,
+   ../layerbit-image-editor-android, ../sheaf-android and ../deja-android are REFERENCE and
+   SOURCE OF COPIES. Never edit them from this session. Never depend on them at build
+   time: copy what you need into this repo with a comment saying where it came from, and
+   keep the file's own "why" comments.
+3. Read, in this order, before writing code: ../stave-android/CLAUDE.md (every section:
+   the "never write verified for what you could not observe" rule, the checker list, the
+   conventions, the model-conversion lessons), ../stave-android/docs/STAVE_BRIEF.md
+   section 5 (how a task audit is written), ../squish-android/CLAUDE.md (the phone rules
+   and the LiteRT lesson), ../layerbit-image-editor-android/README.md and its Theme.kt,
+   ../deja-android (how a screenshot is read and indexed on the device),
+   ../stave-android/tools/models (how a model is converted and checked against its
+   reference run), ../stave-android/models_pack (how an asset pack is wired).
+4. Build environment on this laptop, from Stave's CLAUDE.md: JDK 21 at
+   $HOME/.jdks/jbr-21.0.11, never Android Studio's bundled JBR 25; ANDROID_HOME at
+   C:\Users\vysak\AppData\Local\Android\Sdk; Python 3.12 is "python" (python3 is the Store
+   stub); the tools/check_*.py checkers need PYTHONUTF8=1; prefix adb with
+   MSYS_NO_PATHCONV=1; never touch a source file while a Gradle build is running; never
+   edit a runner script while it runs; tools/jvm/run.sh needs a ";" classpath separator on
+   Windows. The phone is the owner's moto g84 (serial ZY32J8HF2S); a second, 4 GB phone is
+   needed from P2 and the owner will name it. Before any tap confirm the phone is free and
+   Ikshana is the resumed activity. Never delete the owner's media. Never run a test sweep
+   in the owner's own data.
+
+== NON-NEGOTIABLES ==
+- Package com.layerbit.ikshana. Versions as Stave's build files unless a library forces
+  otherwise; write down why if it does.
+- AndroidManifest.xml removes INTERNET and ACCESS_NETWORK_STATE with tools:node="remove"
+  and declares CAMERA and nothing else (VIBRATE is normal-level and allowed).
+  tools/verify_manifest.py, copied from Stave with CAMERA required and microphone,
+  location, contacts and storage forbidden, fails CI if the merged manifest changes on
+  these points. Never resolve a merge by deleting those lines.
+- Licence GPL-3.0. Every third-party piece and every dataset in THIRD_PARTY_NOTICES.md
+  the day it is added, with its licence, and every dataset's licence pinned to the page it
+  was downloaded from BEFORE a single line of it is used to train anything. Where sources
+  disagree on a licence, write both down and ask the owner before training.
+- Modules: :engine (pure Kotlin, imports nothing from android.*, every rule and every
+  piece of arithmetic that can be separated from the framework lives here and is executed
+  on the JVM), :app (Compose, CameraX, the doors, LiteRT), native under app/src/main/cpp
+  only for what Kotlin cannot do fast enough, with a Kotlin twin executed by a suite
+  wherever the arithmetic can be mirrored (Stave's LiveTune lesson).
+- Models arrive by Play asset pack and inside the GitHub "full" APK, never by a download
+  the app performs. Every model has a tier in docs/MODELS.md: fully ours, trained by us on
+  open data, or fine-tuned from open weights; a score from the harness; and a lighter
+  twin or a named fallback mode for a phone that cannot run it.
+- A model is never trusted on the phone until its conversion has been checked against
+  the reference run on an input the conversion never saw (Stave's rule: no converter
+  worked as delivered; one flat input, one flat output, every state explicit). LiteRT
+  1.4.0, never TensorFlow Lite 2.16.1.
+- The test set and the harness (P1) exist before any model is trained. Nothing is judged
+  by eye or by ear; every claim about a model is a number in docs/MODELS.md.
+- Design: voice first; the gestures of the brief's section 4 on every screen; earcons with
+  haptic twins; 64 dp targets; the near-black field of the icon with its blue as the one
+  accent; Space Grotesk and Fira Code; a name and a state on every control. The
+  display-off gate: every screen driven with TalkBack and the display dark, by a blind
+  tester before a release. Zero NAF nodes in uiautomator dump is the floor.
+- Conventions carried from Squish and Stave (write them into CLAUDE.md): comments say why
+  not what; String.format(Locale.ROOT) for anything machine-readable and never cut a
+  localised string with an ASCII literal; count code points not chars; three letters is a
+  Latin rule; selectable not clickable where a tint is the only mark; Compose compares
+  unstable parameters by identity so declare stable collections and never mutate a list
+  you have passed down; every float into a file goes through putFinite; a native handle
+  can be negative; engine tables reach the screen by id through text/Labels with a
+  translation per language the app speaks.
+- Verification, in Stave's words: never write "verified" for something this session could
+  not observe. ./gradlew :engine:test assembleDebug lintDebug settles a build, and only
+  the phone, with a blind tester, settles a feature. Every pure rule gets a tools/jvm
+  suite executed with real numbers, and every suite is negative-tested on a copy in the
+  scratchpad: put the fault back, run the suite, watch it fail, restore. When a mistake
+  escapes, write the check that would have caught it before writing the fix.
+- Git: commit after every task with a message that says why; push to main when the build
+  passes, without asking. No model name in commits, code or docs. Never force-push.
+
+== WHAT TO CARRY ACROSS (copy, attribute, adapt) ==
+From ../stave-android: tools/verify_manifest.py, the five tools/check_*.py,
+tools/jvm/run.sh, Registry.kt, RunnerChecks.kt, jc.sh, run_desktop.sh, the theme and the
+shared components, models_pack wiring, tools/models conversion pattern, the CI workflows,
+CLAUDE.md's structure. From ../squish-android: the converted Indic voices and
+Tts/NeuralVoice/TtsRules, the voices release pattern, Wer.kt as the shape of a scorer.
+From ../layerbit-image-editor-android: ColourName, the engine's histogram and blur
+arithmetic for the frame gate, the manifest pattern. From ../deja-android: the screenshot
+OCR door and index, as reference for the Read pipeline's shape.
+
+== NEW PIECES (Apache/MIT first) ==
+CameraX (Apache-2.0). LiteRT 1.4.0 (Apache-2.0). Our own OCR detector and recogniser
+trained under tools/models/ocr with PyTorch and exported, one recogniser head per script,
+every script of the 22 scheduled languages in turn. Our own currency CNN under
+tools/models/currency. A SmolVLM2-class vision-language model (Apache-2.0) for Describe,
+Find and Ask, fine-tuned under tools/models/vlm, with its lighter twin beside it; if its
+graph will not convert to LiteRT, llama.cpp's loop (MIT) built in native.yml, decided by
+measurement and written down. IndicTrans2 distilled (MIT) under tools/models/translate.
+The open scene-text sets (IndicSTR12, Bharat Scene Text, ICDAR MLT) with licences pinned.
+Fonts under OFL for the synthetic text and the UI.
+
+== THE ORDER OF WORK ==
+docs/ROADMAP.md is the checklist, written from section 5 of docs/IKSHANA_BRIEF.md with
+every task as a checkbox and its check beside it, with Stave's three marks ([x] seen on a
+phone, [~] built not seen, [ ] not built). Add to P0 the two documents the owner's rules
+need: docs/FALLBACKS.md (every failure, the mode it falls to, the sentence spoken) and
+the FallbackChecks suite over the engine's mode state machine. Work from the first
+unchecked item. Do not skip ahead: P0 foundations, P1 the test set and harness, P2 Read
+(v0.1), P3 Money and Describe (v0.2), P4 Find (v0.3), P5 Translate (v0.4), P6 Ask (v0.5),
+P7 polish (v1.0), then the scripts and languages beyond the first five, one per release,
+each with its number in docs/MODELS.md. Each phase ends with its release gate run with a
+blind tester if one is available and written into docs/DEVICE_FINDINGS.md with the date;
+otherwise the gate goes into docs/PENDING_TESTS.md in order and the item is marked
+built-not-seen, never done.
+
+Within a task: write the pure rule in :engine first, write its suite, run it, break it and
+watch it fail, restore; then the model or UI piece; then the gate; then commit and push.
+Keep CLAUDE.md current: what took an hour to find out goes in there in one paragraph for
+the next stranger.
+
+== DOCUMENTS TO WRITE IN P0 ==
+README.md in the family's voice ("A camera that answers, and cannot upload what it sees";
+why this exists; nothing leaves the phone; built for the blind first; it never goes
+silent; the table of what it does; which models are ours, in those words; the size and
+why). CLAUDE.md. ARCHITECTURE.md (the modules, the frame path, where every model lives,
+how it is swapped on a 4 GB phone, the mode state machine and its fallbacks).
+BUILD_NOTES.md (CameraX choices, LiteRT delegates, the asset packs). docs/COMPETITORS.md
+(section 2 of the brief, dated, "read, not driven"). docs/ROADMAP.md,
+docs/DEVICE_FINDINGS.md, docs/PENDING_TESTS.md, docs/MODELS.md, docs/FALLBACKS.md,
+THIRD_PARTY_NOTICES.md, LICENSE (GPL-3.0), fastlane/ metadata. store-assets/ already
+holds the icon, the Play icon and the feature graphic.
+
+== WHAT DONE LOOKS LIKE FOR THIS SESSION ==
+Work until the context runs low. Before you stop: every change committed and pushed to
+main; CI green or the failure named in docs/PENDING_TESTS.md; docs/ROADMAP.md ticked
+honestly; docs/MODELS.md carrying a number for every model that exists; docs/FALLBACKS.md
+carrying a sentence for every failure that exists; CLAUDE.md told what you learned; a
+final message that says which roadmap items are done, which are built-not-seen, and what
+the next session should do first. Do not describe anything as working on a phone unless
+you watched it work there, and do not describe anything as working for a blind user
+unless one said so. Begin with P0 item 1 unless docs/ROADMAP.md already exists, in which
+case begin at its first unchecked item.
+================================================================================
+
+Later sessions: open Git Bash, cd into the folder, `git pull`, run `claude`, and paste
+the same text. It resumes from the roadmap's first open box.
