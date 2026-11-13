@@ -1,6 +1,7 @@
 # Pending tests
 
-Built and not seen, in the order to run them when the phone and a tester are free. Each says
+Built and not seen, in the order to run them when the phone and a tester are free (the next
+session's step-by-step plan is `docs/TEST_PLAN.md`). Each says
 what would count as seen. Move an item to `DEVICE_FINDINGS.md` with the date when it is.
 
 Before any tap: `dumpsys telephony.registry | grep mCallState` is 0 and Ikshana is the resumed
