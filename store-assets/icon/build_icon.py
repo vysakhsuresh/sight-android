@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
-"""Builds every Ikshana icon asset from one drawing: the golden iris that reads braille and speaks.
+"""Builds every Ikshana icon asset from one drawing: the golden iris that reads braille.
 
 Fifth drawing, chosen by the owner on 13 Nov from twenty-odd concepts ("5G it is"). A real iris
 drawn fibre by fibre in gold metal, set in a polished gold ring on black; the pupil holds the
 braille cell for "i" (dots 2 and 4 raised and glowing, the other four felt as rings), because
-Ikshana is made for the blind first; two gold waves leave it, because it speaks what it sees.
+Ikshana is made for the blind first. The two gold waves that once left it are gone, and the iris
+is alone on black, centred and large (the owner's choice from samples, 13 Nov).
 The owner rejected flat line art twice ("a kindergarten student will take it from the
-internet"): the rendering (fibres, collar, limbal ring, catchlights, glow) is the point.
+internet"): the rendering (fibres, collar, limbal ring, catchlights) is the point.
 
 Generated, not traced. The same geometry, drawn once here, becomes:
 
@@ -28,7 +29,7 @@ owner's laptop, Edge and Pillow (render_edge.py).
 
 Why rasters for the adaptive layers: gradients, blurs and 260 fibres are the icon, and a
 VectorDrawable carries none of the blurs. The themed icon and the notification glyph are
-vectors because they must be; they carry the reduced mark (ring, iris, braille, waves).
+vectors because they must be; they carry the reduced mark (ring, iris, braille).
 """
 import json, math, os, random, subprocess, sys
 
@@ -37,28 +38,16 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 RES = os.path.join(ROOT, "app", "src", "main", "res")
 DENSITIES = {"mdpi": 1, "hdpi": 1.5, "xhdpi": 2, "xxhdpi": 3, "xxxhdpi": 4}
 
-# The owner asked for the iris "a little more big" (13 Nov): the whole drawing grows 12% about the
-# tile's centre, so the waves keep their place beside it. The farthest point, the outer wave's
-# tip, is then 34 from the centre, still inside the circle of radius 36 a launcher shows.
-FG_SCALE = 1.12
-CX, CY = 48.0, 54.0        # the iris sits left of centre; the waves balance it on the right
+# The owner asked for the iris bigger, twice (13 Nov). The drawing grows 42% about the tile's
+# centre: the ring's outer edge is then 23 * 1.42 = 32.7 from it, inside the circle of radius 33
+# that every launcher mask keeps, so no mask clips the gold.
+FG_SCALE = 1.42
+CX, CY = 54.0, 54.0        # alone, the iris is centred
 R_RING = 23.0              # outer edge of the gold ring
-R_IRIS = 21.2
-R_PUPIL = 8.2
-DOT_DX, DOT_DY, DOT_R = 2.5, 3.9, 1.15   # the braille cell inside the pupil
-WAVES = ((29.5, 2.8, 1.0), (35.0, 2.4, .7))   # radius, width, opacity
-WAVE_SPAN = 26.0           # degrees either side of horizontal
+R_IRIS = 21.8              # the gold band is 0.8 wide: the owner chose the thinner ring
+R_PUPIL = 10.4             # a wide pupil, so the braille cell is large enough to read on a phone
+DOT_DX, DOT_DY, DOT_R = 3.2, 4.6, 1.8    # the braille cell inside the pupil
 FIBRE_SEED = 3             # the fibres are random but fixed: the same icon on every build
-
-
-def pt(r, deg, cx=CX, cy=CY):
-    a = math.radians(deg)
-    return cx + r * math.cos(a), cy + r * math.sin(a)
-
-
-def arc_path(r, span, cx=CX, cy=CY):
-    x0, y0 = pt(r, -span, cx, cy); x1, y1 = pt(r, span, cx, cy)
-    return f"M{x0:.2f},{y0:.2f} A{r:.2f},{r:.2f} 0 0,1 {x1:.2f},{y1:.2f}"
 
 
 def braille_dots():
@@ -74,12 +63,12 @@ def braille():
     out = ""
     for x, y, raised in braille_dots():
         if raised:
-            out += (f'<circle cx="{x:.2f}" cy="{y:.2f}" r="{DOT_R * 2.4:.2f}" fill="#FFC85F" opacity=".5" filter="url(#bl1)"/>'
+            out += (f'<circle cx="{x:.2f}" cy="{y:.2f}" r="{DOT_R * 2.2:.2f}" fill="#FFC85F" opacity=".85" filter="url(#bl1)"/>'
                     f'<circle cx="{x:.2f}" cy="{y:.2f}" r="{DOT_R:.2f}" fill="url(#dotLit)"/>'
                     f'<circle cx="{x - DOT_R * .35:.2f}" cy="{y - DOT_R * .4:.2f}" r="{DOT_R * .3:.2f}" fill="#fff" opacity=".9"/>')
         else:
             out += (f'<circle cx="{x:.2f}" cy="{y:.2f}" r="{DOT_R * .8:.2f}" fill="none" stroke="#FFD27A" '
-                    f'stroke-opacity=".4" stroke-width="{DOT_R * .32:.2f}"/>')
+                    f'stroke-opacity=".75" stroke-width="{DOT_R * .3:.2f}"/>')
     return out
 
 
@@ -101,7 +90,7 @@ def fibres():
 
 
 # Filter regions are in the tile's own space: a box-relative region on a thin arc is a few units
-# wide and cut the waves' glow into rectangles (13 Nov).
+# wide and cut the old waves' glow into rectangles (13 Nov).
 DEFS = """<defs>
 <filter id="bl1" filterUnits="userSpaceOnUse" x="-20" y="-20" width="148" height="148"><feGaussianBlur stdDeviation=".9"/></filter>
 <filter id="bl2" filterUnits="userSpaceOnUse" x="-20" y="-20" width="148" height="148"><feGaussianBlur stdDeviation="2"/></filter>
@@ -112,7 +101,6 @@ DEFS = """<defs>
 <radialGradient id="limbal" cx="50%" cy="50%" r="50%"><stop offset=".78" stop-color="#140B02" stop-opacity="0"/><stop offset="1" stop-color="#0A0601" stop-opacity=".95"/></radialGradient>
 <radialGradient id="collar" cx="50%" cy="50%" r="50%"><stop offset=".3" stop-color="#FFF1C4" stop-opacity="0"/><stop offset=".42" stop-color="#FFF1C4" stop-opacity=".55"/><stop offset=".6" stop-color="#FFF1C4" stop-opacity="0"/></radialGradient>
 <linearGradient id="metalRing" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF4CC"/><stop offset=".3" stop-color="#E8C268"/><stop offset=".55" stop-color="#7A4E10"/><stop offset=".78" stop-color="#F7D47E"/><stop offset="1" stop-color="#4A3008"/></linearGradient>
-<linearGradient id="waveG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF4D6"/><stop offset=".5" stop-color="#F2C65A"/><stop offset="1" stop-color="#C8902E"/></linearGradient>
 <radialGradient id="dotLit" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".5" stop-color="#FFE7A8"/><stop offset="1" stop-color="#E0A030"/></radialGradient>
 <linearGradient id="win" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".7"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
 </defs>"""
@@ -121,18 +109,10 @@ DEFS = """<defs>
 # as grey beside the gold.
 BACKGROUND = '<rect width="108" height="108" fill="#000"/>'
 
-WAVES_SVG = "".join(
-    f'<path d="{arc_path(r, WAVE_SPAN)}" fill="none" stroke="#FFB84D" stroke-width="{w + 2}" opacity=".35" filter="url(#bl2)" stroke-linecap="round"/>'
-    f'<path d="{arc_path(r, WAVE_SPAN)}" fill="none" stroke="url(#waveG)" stroke-width="{w}" opacity="{op}" stroke-linecap="round"/>'
-    for r, w, op in WAVES)
-
+# No glow or shadow round the ring: the owner wants pure black outside the iris (13 Nov).
 ART = (
-    # the warm light the iris gives off, and its shadow
-    f'<circle cx="{CX}" cy="{CY}" r="30" fill="#FFB84D" opacity=".22" filter="url(#bl8)"/>'
-    + f'<circle cx="{CX + 1}" cy="{CY + 2.5}" r="{R_RING}" fill="#000" opacity=".7" filter="url(#bl2)"/>'
-    + WAVES_SVG
     # the polished gold ring
-    + f'<circle cx="{CX}" cy="{CY}" r="{R_RING}" fill="url(#metalRing)"/>'
+    f'<circle cx="{CX}" cy="{CY}" r="{R_RING}" fill="url(#metalRing)"/>'
     + f'<circle cx="{CX}" cy="{CY}" r="{R_RING - .1}" fill="none" stroke="#FFF6D8" stroke-opacity=".6" stroke-width=".35"/>'
     + f'<circle cx="{CX}" cy="{CY}" r="{R_IRIS + .4}" fill="#0A0704"/>'
     # the iris: base colour, fibres, the bright collar round the pupil, the dark limbal ring
@@ -172,24 +152,19 @@ def write(path, text):
 # ---- vectors: the reduced mark for the themed icon and the status bar --------------------
 def mark_paths(k, colour):
     """The mark in one colour, scaled by k about the tile's centre: the ring, the iris solid with
-    the pupil cut out, the two raised braille dots standing in the pupil, and the two waves."""
+    the pupil cut out, and the two raised braille dots standing in the pupil."""
     def p(x, y):
         return 54 + (x - 54) * k, 54 + (y - 54) * k
     def circle(r, cx=CX, cy=CY):
         x, y = p(cx - r, cy); rr = r * k
         return f"M{x:.2f},{y:.2f} a{rr:.2f},{rr:.2f} 0 1,0 {2 * rr:.2f},0 a{rr:.2f},{rr:.2f} 0 1,0 {-2 * rr:.2f},0"
-    out = (f'<path android:pathData="{circle(R_RING - .8)}" android:strokeColor="{colour}" '
-           f'android:strokeWidth="{1.6 * k:.2f}" android:fillColor="#00000000"/>')
+    out = (f'<path android:pathData="{circle(R_RING - .5)}" android:strokeColor="{colour}" '
+           f'android:strokeWidth="{1.0 * k:.2f}" android:fillColor="#00000000"/>')
     out += (f'<path android:pathData="{circle(R_IRIS - 1.6)} {circle(R_PUPIL + .6)}" android:fillColor="{colour}" '
             f'android:fillType="evenOdd"/>')
     for x, y, raised in braille_dots():
         if raised:
             out += f'<path android:pathData="{circle(DOT_R * 1.5, x, y)}" android:fillColor="{colour}"/>'
-    for r, w, _ in WAVES:
-        x0, y0 = p(*pt(r, -WAVE_SPAN)); x1, y1 = p(*pt(r, WAVE_SPAN))
-        out += (f'<path android:pathData="M{x0:.2f},{y0:.2f} A{r * k:.2f},{r * k:.2f} 0 0,1 {x1:.2f},{y1:.2f}" '
-                f'android:strokeColor="{colour}" android:strokeWidth="{(w + .6) * k:.2f}" '
-                f'android:strokeLineCap="round" android:fillColor="#00000000"/>')
     return out
 
 
@@ -197,15 +172,15 @@ VECTOR_HEAD = ('<?xml version="1.0" encoding="utf-8"?>\n<vector xmlns:android="h
                '    android:width="{w}dp" android:height="{w}dp" android:viewportWidth="108" android:viewportHeight="108">\n')
 
 MONOCHROME = (VECTOR_HEAD.format(w=108)
-              + "    <!-- The themed icon: the ring, the iris, the braille i in its pupil and the two waves,\n"
+              + "    <!-- The themed icon: the ring, the iris and the braille i in its pupil,\n"
               "         in one colour the launcher tints. Built by store-assets/icon/build_icon.py; do not\n"
               "         edit by hand. -->\n"
-              + mark_paths(.95 * FG_SCALE, "#FF000000") + "\n</vector>\n")
+              + mark_paths(FG_SCALE, "#FF000000") + "\n</vector>\n")
 
 NOTIFICATION = (VECTOR_HEAD.format(w=24)
                 + "    <!-- Status-bar glyph: white on transparent, the same reduced mark, filling the canvas.\n"
                 "         Built by store-assets/icon/build_icon.py. -->\n"
-                + mark_paths(1.4, "#FFFFFFFF") + "\n</vector>\n")
+                + mark_paths(2.3, "#FFFFFFFF") + "\n</vector>\n")
 
 ADAPTIVE = ('<?xml version="1.0" encoding="utf-8"?>\n'
             '<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">\n'
