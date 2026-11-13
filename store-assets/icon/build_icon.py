@@ -37,9 +37,10 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 RES = os.path.join(ROOT, "app", "src", "main", "res")
 DENSITIES = {"mdpi": 1, "hdpi": 1.5, "xhdpi": 2, "xxhdpi": 3, "xxxhdpi": 4}
 
-# Everything sits within 31 of the tile's centre, inside the circle of radius 36 a launcher
-# shows, so the foreground is drawn at the size the owner approved.
-FG_SCALE = 1.0
+# The owner asked for the iris "a little more big" (13 Nov): the whole drawing grows 12% about the
+# tile's centre, so the waves keep their place beside it. The farthest point, the outer wave's
+# tip, is then 34 from the centre, still inside the circle of radius 36 a launcher shows.
+FG_SCALE = 1.12
 CX, CY = 48.0, 54.0        # the iris sits left of centre; the waves balance it on the right
 R_RING = 23.0              # outer edge of the gold ring
 R_IRIS = 21.2
@@ -116,7 +117,9 @@ DEFS = """<defs>
 <linearGradient id="win" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".7"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
 </defs>"""
 
-BACKGROUND = '<rect width="108" height="108" fill="url(#bg)"/><rect width="108" height="108" fill="url(#gloss)"/>'
+# Plain black, as the owner asked (13 Nov); the earlier warm-charcoal gradient and its gloss read
+# as grey beside the gold.
+BACKGROUND = '<rect width="108" height="108" fill="#000"/>'
 
 WAVES_SVG = "".join(
     f'<path d="{arc_path(r, WAVE_SPAN)}" fill="none" stroke="#FFB84D" stroke-width="{w + 2}" opacity=".35" filter="url(#bl2)" stroke-linecap="round"/>'
@@ -155,7 +158,7 @@ def scaled(body, k):
     return f'<g transform="translate(54 54) scale({k:.5f}) translate(-54 -54)">{body}</g>'
 
 
-MASTER = svg(BACKGROUND + ART)
+MASTER = svg(BACKGROUND + scaled(ART, FG_SCALE))
 FOREGROUND = svg(scaled(ART, FG_SCALE))      # transparent field
 BACKGROUND_ONLY = svg(BACKGROUND)
 
@@ -197,7 +200,7 @@ MONOCHROME = (VECTOR_HEAD.format(w=108)
               + "    <!-- The themed icon: the ring, the iris, the braille i in its pupil and the two waves,\n"
               "         in one colour the launcher tints. Built by store-assets/icon/build_icon.py; do not\n"
               "         edit by hand. -->\n"
-              + mark_paths(.95, "#FF000000") + "\n</vector>\n")
+              + mark_paths(.95 * FG_SCALE, "#FF000000") + "\n</vector>\n")
 
 NOTIFICATION = (VECTOR_HEAD.format(w=24)
                 + "    <!-- Status-bar glyph: white on transparent, the same reduced mark, filling the canvas.\n"
