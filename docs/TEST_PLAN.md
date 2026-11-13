@@ -1,7 +1,7 @@
 # Test plan: the next phone session (written 13 Nov)
 
-For the moto g84 (ZY32J8HF2S), the build installed at 09:18 on 13 Nov (commit 045e87b: the
-icon, the reading-loop fix, Ask and Find wired). About 75 minutes. Two people: **the owner**
+For the moto g84 (ZY32J8HF2S), the build installed at 13:07 on 13 Nov (commit bd1fd61: the
+lens icon, the reading-loop fix, Ask and Find wired). About 75 minutes. Two people: **the owner**
 holds the phone and listens; **the session** works over adb and reads the log. Every result goes
 into `docs/DEVICE_FINDINGS.md` with the date, as one of: *heard*, *felt*, *seen on screen*,
 *logged only*, or *failed* (with what happened instead). `PENDING_TESTS` items move there when
@@ -14,7 +14,9 @@ Log tags, read by the session throughout:
 
 ## 0. Before anything (session)
 
-1. Ask the Stave session whether it is finished with the phone. Nothing starts until it says so.
+1. Ask the Stave session whether it is finished with the phone. Nothing starts until it says so,
+   and until the owner says the phone is free (13 Nov 13:05: Stave done; owner in Photos and
+   WhatsApp).
 2. `dumpsys telephony.registry | grep mCallState` is 0 (not on a call).
 3. Note battery %, temperature (`dumpsys battery`), and free memory (`dumpsys meminfo | head`).
 4. Follow the log from now: `logcat -T 1 -v time` filtered to the tags above. The shared log
@@ -24,8 +26,8 @@ Log tags, read by the session throughout:
 
 | Step | Pass |
 |---|---|
-| Look at the home screen and the app drawer | The new black hole: rays bursting out, the disk across it, no rings |
-| If themed icons are on (wallpaper and style, then themed icons) | The one-colour mark: a hole, its ring and a tilted bar |
+| Look at the home screen and the app drawer | A metal camera lens on blue-to-violet, its aperture an eye (six blades, blue iris, black pupil), three sound waves to the right; the lens clear of the round edge |
+| If themed icons are on (wallpaper and style, then themed icons) | The one-colour mark: a solid lens with the six-sided aperture cut out, a pupil, three wave arcs |
 | Notification shade while Ikshana runs, if a notification shows | The same small mark |
 
 ## 2. Start (owner, 2 min)
