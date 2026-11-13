@@ -49,7 +49,10 @@ def main(jobs_path):
         else:
             big = max(1024, j["size"])
             svg = open(os.path.join(here, j["svg"]), encoding="utf-8").read()
-            svg = svg.replace('width="108" height="108"', f'width="{big}" height="{big}"')
+            # The <svg> tag only: a full-tile <rect> carries the same attributes, and resizing it
+            # too stretched every gradient across ten tiles, so the field came out one flat colour
+            # (13 Nov; every icon before then was rendered so).
+            svg = svg.replace('width="108" height="108"', f'width="{big}" height="{big}"', 1)
             page = os.path.join(tmp, f"{i}.html")
             with open(page, "w", encoding="utf-8") as f:
                 f.write(f'<html><body style="margin:0;background:transparent">{svg}</body></html>')
