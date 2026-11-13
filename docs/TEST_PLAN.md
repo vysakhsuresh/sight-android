@@ -26,8 +26,8 @@ Log tags, read by the session throughout:
 
 | Step | Pass |
 |---|---|
-| Look at the home screen and the app drawer | The medallion: a gold and amber eye in flowing gold and teal waves on deep navy, filling the round icon with no navy ring or cut-off edge |
-| If themed icons are on (wallpaper and style, then themed icons) | The one-colour mark: an open eye, its two lids and a solid iris with the pupil cut out |
+| Look at the home screen and the app drawer | The lens: glossy dark blue with a glowing cyan centre, three teal arcs to its right, on navy; no arc tip cut off by the round edge |
+| If themed icons are on (wallpaper and style, then themed icons) | The one-colour mark: a ring with a solid dot in it, two arcs to its right |
 | Notification shade while Ikshana runs, if a notification shows | The same small mark |
 
 ## 2. Start (owner, 2 min)

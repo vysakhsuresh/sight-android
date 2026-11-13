@@ -35,7 +35,7 @@ and the second belongs on Play to a coaching brand with millions of installs. A 
 | Package | `com.layerbit.ikshana` |
 | Repo | `vysakhsuresh/ikshana-android` |
 | Tagline | A camera that answers, and cannot upload what it sees. |
-| Icon | The owner's artwork (13 Nov): a round medallion on deep navy, a gold and amber eye held in flowing gold and teal waves (`store-assets/icon/source/ikshana.jpeg`; `store-assets/icon/build_icon.py` fits it to every launcher and store asset). |
+| Icon | The owner's artwork, final (13 Nov): a glossy dark-blue lens with a glowing cyan centre and three teal arcs of sound to its right, on flat navy (`store-assets/icon/source/ikshana.png`; `store-assets/icon/build_icon.py` fits it to every launcher and store asset). |
 
 Runners-up if Ikshana is ever blocked: **Pratyaksha** (direct perception, nothing in
 between; long), **Nokku** (Malayalam, "look"; local).

@@ -104,10 +104,10 @@ must end at Help.
   that only says "not ready" reads as broken; every unbuilt mode now says what it will do. The
   owner rejected the almond-eye icon ("no eyelid"), then the black hole, the lens and flat line
   art; on 13 Nov they chose a golden iris on black, then turned down its braille pupil ("two
-  lights coming from inside"), liked a voice-bar sample, and settled on their own artwork: a Gemini
-  medallion, a gold eye in gold and teal waves on navy (`store-assets/icon/source/ikshana.jpeg`;
-  the rejected ones are in `../ikshana-icon-options`). They judge icons by rendering craft, not
-  idea alone.
+  lights coming from inside"), liked a voice-bar sample, tried a Gemini medallion, and called
+  their own DeepSeek artwork final: a glossy blue lens with a glowing cyan centre and three teal
+  arcs of sound, on navy (`store-assets/icon/source/ikshana.png`; the rejected ones are in
+  `../ikshana-icon-options`). They judge icons by rendering craft, not idea alone.
 - **The owner wants decisions, not menus.** Decide for the blind user, build it, say what was
   decided. Stop only for what a permission or the owner's phone and data require.
 - **Running or building code fetched from outside (llama.cpp) is refused by this laptop's
