@@ -95,7 +95,7 @@ class ReadMemory(private val capacity: Int = 200) {
         val out = ArrayList<String>()
         for (l in lines) {
             val k = ReadText.key(l)
-            if (k.isEmpty() || k in said) continue
+            if (k.isEmpty() || k in said || said.any { same(it, k) }) continue
             said += k
             out += l
             while (said.size > capacity) said.remove(said.first())
@@ -104,6 +104,46 @@ class ReadMemory(private val capacity: Int = 200) {
     }
 
     fun clear() = said.clear()
+
+    companion object {
+        /** Letters alike at least this much (1 - edit distance / longer length) are one line. */
+        const val ALIKE = 0.8
+        /** Below this many letters a line must match exactly: "exit" and "exif" are not one. */
+        const val FUZZY_FROM = 6
+
+        /**
+         * Whether two keys are one line read twice. The recogniser almost never reads a line the
+         * same way on two frames ("paracetamol" then "paracetamo1"), and an exact match let the
+         * same strip be said again on every frame, for ever (owner, 13 Nov). Digits must agree
+         * exactly: "platform 4" and "platform 5" differ by one letter's worth and are not one.
+         * A line read in part on one frame is the same line, too.
+         */
+        fun same(a: String, b: String): Boolean {
+            if (a == b) return true
+            val da = a.filter { it.isDigit() }; val db = b.filter { it.isDigit() }
+            val (short, long) = if (a.length <= b.length) a to b else b to a
+            // Part of a line: "paracetamol" inside the whole strip. Only with no digits of its
+            // own or the same ones, so "platform4" is not taken as part of "platform45".
+            val shortDigits = if (short === a) da else db
+            if (short.length >= FUZZY_FROM && long.contains(short) && (shortDigits.isEmpty() || da == db)) return true
+            if (da != db) return false
+            val la = a.filterNot { it.isDigit() }; val lb = b.filterNot { it.isDigit() }
+            if (minOf(la.length, lb.length) < FUZZY_FROM) return false
+            return 1.0 - distance(la, lb).toDouble() / maxOf(la.length, lb.length) >= ALIKE
+        }
+
+        private fun distance(a: String, b: String): Int {
+            var prev = IntArray(b.length + 1) { it }
+            for (i in 1..a.length) {
+                val cur = IntArray(b.length + 1); cur[0] = i
+                for (j in 1..b.length) {
+                    cur[j] = minOf(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + if (a[i - 1] == b[j - 1]) 0 else 1)
+                }
+                prev = cur
+            }
+            return prev[b.length]
+        }
+    }
 }
 
 /**
@@ -123,6 +163,10 @@ class NothingPacer {
         lastSaid = nowMs
         return true
     }
+
+    /** A new mode starts its own wait: Money said "nothing found" two seconds in, on the time
+     *  Read had already spent empty (13 Nov log). */
+    fun clear() { emptySince = -1L; lastSaid = -1L }
 
     companion object {
         const val AFTER_MS = 4_000L

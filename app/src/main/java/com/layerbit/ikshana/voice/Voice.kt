@@ -100,6 +100,19 @@ class Voice(context: Context, private val onUnavailable: (String) -> Unit) {
 
     val isPaused: Boolean get() = synchronized(lock) { paused }
 
+    /** Whether anything is being said or waits to be (a paused line waits): Read looks again only
+     *  when this is false, so the queue cannot grow faster than it is spoken. */
+    val busy: Boolean get() = synchronized(lock) { !failed && (current != null || pending.isNotEmpty()) }
+
+    /** A new mode: what the old one queued is dropped and the current line cut. Without this a
+     *  long Read queue went on speaking after the owner chose another mode (13 Nov). */
+    fun clear() = synchronized(lock) {
+        pending.clear()
+        current = null
+        paused = false
+        if (ready) tts.stop()
+    }
+
     private fun flush() {
         if (paused || current != null) return
         val item = pending.removeFirstOrNull() ?: return

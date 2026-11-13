@@ -113,6 +113,8 @@ class Session(private val context: Context, val prefs: Prefs) {
         if (Looper.myLooper() != Looper.getMainLooper()) { main.post { send(event) }; return }
         val step = ModeMachine.step(state, event)
         val before = state.active
+        // Before this step's own words, so the new mode's name is not cut with the old queue.
+        if (step.state.active != before) { voice.clear(); paused = false; pacer.clear() }
         state = step.state
         for (e in step.effects) when (e) {
             // Logged so a phone session can read what was handed to the voice without hearing
@@ -177,6 +179,9 @@ class Session(private val context: Context, val prefs: Prefs) {
     }
 
     private fun readFrame(f: CameraDoor.Frame) {
+        // One look per thing said: reading on while the voice is behind queued lines faster
+        // than they could be spoken, the loop the owner heard on 13 Nov.
+        if (voice.busy) return
         val langs = readLanguages
         if (!reader.open(langs)) { send(Event.ModelFailed(Models.OCR_TESSERACT)); return }
         val started = System.currentTimeMillis()
@@ -200,6 +205,7 @@ class Session(private val context: Context, val prefs: Prefs) {
     }
 
     private fun moneyFrame(f: CameraDoor.Frame) {
+        if (voice.busy) return
         if (!moneyReader.open("eng")) { send(Event.ModelFailed(Models.OCR_TESSERACT)); return }
         val up = ReadText.rotate(f.y, f.width, f.height, f.rowStride, f.rotation)
         val lines = try { moneyReader.read(up.bytes, up.width, up.height) } catch (e: Throwable) {
