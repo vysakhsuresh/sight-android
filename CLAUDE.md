@@ -103,9 +103,11 @@ must end at Help.
 - **The owner tests on the phone as soon as a build lands and judges by what is spoken.** A mode
   that only says "not ready" reads as broken; every unbuilt mode now says what it will do. The
   owner rejected the almond-eye icon ("no eyelid"), then the black hole, the lens and flat line
-  art; on 13 Nov they chose the golden iris on black, with the braille "i" in its pupil and two
-  waves (concept 5g; the rejected ones are in `../ikshana-icon-options`). They judge icons by
-  rendering craft, not idea alone.
+  art; on 13 Nov they chose a golden iris on black, then turned down its braille pupil ("two
+  lights coming from inside"), liked a voice-bar sample, and settled on their own artwork: a Gemini
+  medallion, a gold eye in gold and teal waves on navy (`store-assets/icon/source/ikshana.jpeg`;
+  the rejected ones are in `../ikshana-icon-options`). They judge icons by rendering craft, not
+  idea alone.
 - **The owner wants decisions, not menus.** Decide for the blind user, build it, say what was
   decided. Stop only for what a permission or the owner's phone and data require.
 - **Running or building code fetched from outside (llama.cpp) is refused by this laptop's

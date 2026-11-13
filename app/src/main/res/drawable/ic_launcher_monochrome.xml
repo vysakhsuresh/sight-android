@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
-    <!-- The themed icon: the ring, the iris and the braille i in its pupil,
-         in one colour the launcher tints. Built by store-assets/icon/build_icon.py; do not
-         edit by hand. -->
-<path android:pathData="M22.05,54.00 a31.95,31.95 0 1,0 63.90,0 a31.95,31.95 0 1,0 -63.90,0" android:strokeColor="#FF000000" android:strokeWidth="1.42" android:fillColor="#00000000"/><path android:pathData="M25.32,54.00 a28.68,28.68 0 1,0 57.37,0 a28.68,28.68 0 1,0 -57.37,0 M38.38,54.00 a15.62,15.62 0 1,0 31.24,0 a15.62,15.62 0 1,0 -31.24,0" android:fillColor="#FF000000" android:fillType="evenOdd"/><path android:pathData="M45.62,54.00 a3.83,3.83 0 1,0 7.67,0 a3.83,3.83 0 1,0 -7.67,0" android:fillColor="#FF000000"/><path android:pathData="M54.71,47.47 a3.83,3.83 0 1,0 7.67,0 a3.83,3.83 0 1,0 -7.67,0" android:fillColor="#FF000000"/>
+    <!-- The themed icon: an open eye, lids and iris, in one colour the launcher tints.
+         Built by store-assets/icon/build_icon.py; do not edit by hand. -->
+<path android:pathData="M24.00,54.00 Q54.00,26.00 84.00,54.00 Q54.00,82.00 24.00,54.00 Z M28.50,54.00 Q54.00,31.50 79.50,54.00 Q54.00,76.50 28.50,54.00 Z" android:fillColor="#FF000000" android:fillType="evenOdd"/><path android:pathData="M41.50,54.00 a12.50,12.50 0 1,0 25.00,0 a12.50,12.50 0 1,0 -25.00,0 M48.80,54.00 a5.20,5.20 0 1,0 10.40,0 a5.20,5.20 0 1,0 -10.40,0 M56.20,49.80 a2.00,2.00 0 1,0 4.00,0 a2.00,2.00 0 1,0 -4.00,0" android:fillColor="#FF000000" android:fillType="evenOdd"/>
 </vector>

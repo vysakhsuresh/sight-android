@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp" android:height="24dp" android:viewportWidth="108" android:viewportHeight="108">
-    <!-- Status-bar glyph: white on transparent, the same reduced mark, filling the canvas.
+    <!-- Status-bar glyph: white on transparent, the same eye, filling the canvas.
          Built by store-assets/icon/build_icon.py. -->
-<path android:pathData="M2.25,54.00 a51.75,51.75 0 1,0 103.50,0 a51.75,51.75 0 1,0 -103.50,0" android:strokeColor="#FFFFFFFF" android:strokeWidth="2.30" android:fillColor="#00000000"/><path android:pathData="M7.54,54.00 a46.46,46.46 0 1,0 92.92,0 a46.46,46.46 0 1,0 -92.92,0 M28.70,54.00 a25.30,25.30 0 1,0 50.60,0 a25.30,25.30 0 1,0 -50.60,0" android:fillColor="#FFFFFFFF" android:fillType="evenOdd"/><path android:pathData="M40.43,54.00 a6.21,6.21 0 1,0 12.42,0 a6.21,6.21 0 1,0 -12.42,0" android:fillColor="#FFFFFFFF"/><path android:pathData="M55.15,43.42 a6.21,6.21 0 1,0 12.42,0 a6.21,6.21 0 1,0 -12.42,0" android:fillColor="#FFFFFFFF"/>
+<path android:pathData="M3.00,54.00 Q54.00,6.40 105.00,54.00 Q54.00,101.60 3.00,54.00 Z M10.65,54.00 Q54.00,15.75 97.35,54.00 Q54.00,92.25 10.65,54.00 Z" android:fillColor="#FFFFFFFF" android:fillType="evenOdd"/><path android:pathData="M32.75,54.00 a21.25,21.25 0 1,0 42.50,0 a21.25,21.25 0 1,0 -42.50,0 M45.16,54.00 a8.84,8.84 0 1,0 17.68,0 a8.84,8.84 0 1,0 -17.68,0 M57.74,46.86 a3.40,3.40 0 1,0 6.80,0 a3.40,3.40 0 1,0 -6.80,0" android:fillColor="#FFFFFFFF" android:fillType="evenOdd"/>
 </vector>

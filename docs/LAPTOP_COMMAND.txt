@@ -60,7 +60,7 @@ Envision on the phone, offline, in Indian languages before English, built for th
 with the display off. The brief is docs/IKSHANA_BRIEF.md in this repository; read it whole
 before planning. Its section 5 is the work order and docs/ROADMAP.md is its checklist.
 The icon is done: store-assets/icon/build_icon.py builds every launcher and store asset
-from one drawing, and app/src/main/res already holds them; keep them, and when the :app
+from the owner's artwork, and app/src/main/res already holds them; keep them, and when the :app
 module is created, point the manifest at @mipmap/ic_launcher and @mipmap/ic_launcher_round.
 
 == THE SHELL ==
