@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
-"""Builds every Ikshana icon asset from one drawing: the seeing lens that speaks.
+"""Builds every Ikshana icon asset from one drawing: the golden iris that reads braille and speaks.
 
-Fourth drawing (owner, 13 Nov). The owner rejected the starburst as clip art that says nothing
-of the app: "something powerful, which relates to the app's purpose, which users will trust and
-install on seeing the icon alone". So the mark is what Ikshana is: a camera lens whose aperture
-is an eye (six blades round a glowing iris, the black pupil at its heart, the black hole of the
-earlier drawings kept there), with three sound waves leaving it: it sees, and it speaks. It is
-drawn as a real, well-made lens (brushed metal barrel, coated glass, catchlights), because
-craft is what reads as trustworthy at a glance. No rings receding, no spiral (owner, 13 Nov).
+Fifth drawing, chosen by the owner on 13 Nov from twenty-odd concepts ("5G it is"). A real iris
+drawn fibre by fibre in gold metal, set in a polished gold ring on black; the pupil holds the
+braille cell for "i" (dots 2 and 4 raised and glowing, the other four felt as rings), because
+Ikshana is made for the blind first; two gold waves leave it, because it speaks what it sees.
+The owner rejected flat line art twice ("a kindergarten student will take it from the
+internet"): the rendering (fibres, collar, limbal ring, catchlights, glow) is the point.
 
 Generated, not traced. The same geometry, drawn once here, becomes:
 
@@ -22,32 +21,33 @@ Generated, not traced. The same geometry, drawn once here, becomes:
   store-assets/icon_512.png                              Play Store icon
   store-assets/feature_graphic_1024x500.png              Play Store feature graphic
 
-Run from the repo root:  python store-assets/icon/build_icon.py
+Run from the repo root, in Git Bash (from the PowerShell tool headless Edge writes nothing):
+  python -P store-assets/icon/build_icon.py
 The SVG and XML need only Python. The PNGs need Node with Playwright (render.js) or, on the
 owner's laptop, Edge and Pillow (render_edge.py).
 
-Why rasters for the adaptive layers: gradients, blurs and clip paths are the icon, and a
+Why rasters for the adaptive layers: gradients, blurs and 260 fibres are the icon, and a
 VectorDrawable carries none of the blurs. The themed icon and the notification glyph are
-vectors because they must be; they carry the reduced mark (barrel, aperture, waves).
+vectors because they must be; they carry the reduced mark (ring, iris, braille, waves).
 """
-import json, math, os, subprocess, sys
+import json, math, os, random, subprocess, sys
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 HERE = os.path.dirname(os.path.abspath(__file__))
 RES = os.path.join(ROOT, "app", "src", "main", "res")
 DENSITIES = {"mdpi": 1, "hdpi": 1.5, "xhdpi": 2, "xxhdpi": 3, "xxxhdpi": 4}
 
-# Everything is drawn inside the circle of radius 36 about the tile's centre, the part a
-# launcher shows; the foreground is still scaled down a little, because at full size the barrel
-# touched the edge of a round mask.
-FG_SCALE = .88
-CX, CY = 46.0, 54.0        # the lens sits left of centre; the waves balance it on the right
-R_BODY = 26.5              # outer edge of the metal barrel
-R_GLASS = 20.5             # the coated glass
-APOTHEM = 8.6              # the aperture opening: a hexagon this far from centre to each edge
-R_PUPIL = 3.4
-WAVES = ((31.5, 3.4, 1.0), (36.5, 3.1, .85), (41.5, 2.8, .65))   # radius, width, opacity
-WAVE_SPAN = 27.0           # degrees either side of horizontal
+# Everything sits within 31 of the tile's centre, inside the circle of radius 36 a launcher
+# shows, so the foreground is drawn at the size the owner approved.
+FG_SCALE = 1.0
+CX, CY = 48.0, 54.0        # the iris sits left of centre; the waves balance it on the right
+R_RING = 23.0              # outer edge of the gold ring
+R_IRIS = 21.2
+R_PUPIL = 8.2
+DOT_DX, DOT_DY, DOT_R = 2.5, 3.9, 1.15   # the braille cell inside the pupil
+WAVES = ((29.5, 2.8, 1.0), (35.0, 2.4, .7))   # radius, width, opacity
+WAVE_SPAN = 26.0           # degrees either side of horizontal
+FIBRE_SEED = 3             # the fibres are random but fixed: the same icon on every build
 
 
 def pt(r, deg, cx=CX, cy=CY):
@@ -55,111 +55,95 @@ def pt(r, deg, cx=CX, cy=CY):
     return cx + r * math.cos(a), cy + r * math.sin(a)
 
 
-def hexagon():
-    rv = APOTHEM / math.cos(math.radians(30))
-    return [pt(rv, 60 * k + 15) for k in range(6)]   # turned 15 degrees: a lens, not a nut
-
-
-def blades():
-    """Six aperture blades. Blade k is bounded by hexagon edge k, the continuation of that edge
-    out to the glass, the glass's rim, and the continuation of edge k-1 back to the vertex: so
-    each blade overlaps the next as real blades do, and their edges sweep like a shutter."""
-    v = hexagon()
-    def extend(a, b):
-        # from b, along a->b, to the glass rim
-        dx, dy = b[0] - a[0], b[1] - a[1]
-        n = math.hypot(dx, dy); dx /= n; dy /= n
-        fx, fy = b[0] - CX, b[1] - CY
-        bq = fx * dx + fy * dy
-        t = -bq + math.sqrt(bq * bq - (fx * fx + fy * fy - (R_GLASS + 2) ** 2))
-        return b[0] + dx * t, b[1] + dy * t
-    out = []
-    for k in range(6):
-        a, b = v[k], v[(k + 1) % 6]
-        e_k = extend(a, b)                       # edge k carried past its far vertex
-        e_prev = extend(v[(k - 1) % 6], a)       # edge k-1 carried past this blade's vertex
-        ang = lambda p: math.degrees(math.atan2(p[1] - CY, p[0] - CX))
-        a0, a1 = ang(e_k), ang(e_prev)
-        # rim from e_k back to e_prev, the short way round
-        d = (a1 - a0 + 540) % 360 - 180
-        rim = [pt(R_GLASS + 2, a0 + d * i / 8) for i in range(1, 8)]
-        poly = [a, b, e_k] + rim + [e_prev]
-        pts = " ".join(f"{x:.2f},{y:.2f}" for x, y in poly)
-        shade = "url(#bladeA)" if k % 2 == 0 else "url(#bladeB)"
-        out.append(f'<polygon points="{pts}" fill="{shade}" stroke="#6FD3FF" stroke-opacity=".28" stroke-width=".35" stroke-linejoin="round"/>')
-    return "".join(out)
-
-
 def arc_path(r, span, cx=CX, cy=CY):
     x0, y0 = pt(r, -span, cx, cy); x1, y1 = pt(r, span, cx, cy)
     return f"M{x0:.2f},{y0:.2f} A{r:.2f},{r:.2f} 0 0,1 {x1:.2f},{y1:.2f}"
 
 
-def ring_arc(r, a0, a1, colour, width, op):
-    x0, y0 = pt(r, a0); x1, y1 = pt(r, a1)
-    large = 1 if (a1 - a0) % 360 > 180 else 0
-    return (f'<path d="M{x0:.2f},{y0:.2f} A{r:.2f},{r:.2f} 0 {large},1 {x1:.2f},{y1:.2f}" fill="none" '
-            f'stroke="{colour}" stroke-width="{width}" stroke-opacity="{op}" stroke-linecap="round"/>')
+def braille_dots():
+    """(x, y, raised) for the six dots of the braille "i": dots 2 and 4 raised."""
+    out = []
+    for col, x in enumerate((CX - DOT_DX, CX + DOT_DX)):
+        for row, y in enumerate((CY - DOT_DY, CY, CY + DOT_DY)):
+            out.append((x, y, col * 3 + row + 1 in (2, 4)))
+    return out
 
 
-HEX = " ".join(f"{x:.2f},{y:.2f}" for x, y in hexagon())
+def braille():
+    out = ""
+    for x, y, raised in braille_dots():
+        if raised:
+            out += (f'<circle cx="{x:.2f}" cy="{y:.2f}" r="{DOT_R * 2.4:.2f}" fill="#FFC85F" opacity=".5" filter="url(#bl1)"/>'
+                    f'<circle cx="{x:.2f}" cy="{y:.2f}" r="{DOT_R:.2f}" fill="url(#dotLit)"/>'
+                    f'<circle cx="{x - DOT_R * .35:.2f}" cy="{y - DOT_R * .4:.2f}" r="{DOT_R * .3:.2f}" fill="#fff" opacity=".9"/>')
+        else:
+            out += (f'<circle cx="{x:.2f}" cy="{y:.2f}" r="{DOT_R * .8:.2f}" fill="none" stroke="#FFD27A" '
+                    f'stroke-opacity=".4" stroke-width="{DOT_R * .32:.2f}"/>')
+    return out
 
-DEFS = f"""<defs>
-<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2C6BF2"/><stop offset=".42" stop-color="#1A47C8"/><stop offset=".78" stop-color="#0F2A86"/><stop offset="1" stop-color="#0A1A5A"/></linearGradient><radialGradient id="bgGlow" cx="30%" cy="22%" r="60%"><stop offset="0" stop-color="#DCEBFF" stop-opacity=".2"/><stop offset="1" stop-color="#DCEBFF" stop-opacity="0"/></radialGradient><radialGradient id="spill" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#5FC8FF" stop-opacity=".45"/><stop offset=".55" stop-color="#2F6BFF" stop-opacity=".14"/><stop offset="1" stop-color="#2F6BFF" stop-opacity="0"/></radialGradient><radialGradient id="vignette" cx="50%" cy="50%" r="50%"><stop offset=".7" stop-color="#030A2A" stop-opacity="0"/><stop offset="1" stop-color="#030A2A" stop-opacity=".4"/></radialGradient>
-<linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF" stop-opacity=".07"/><stop offset=".5" stop-color="#FFFFFF" stop-opacity="0"/></linearGradient>
-<radialGradient id="aura" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#7CCBFF" stop-opacity=".32"/><stop offset=".6" stop-color="#2F6BFF" stop-opacity=".12"/><stop offset="1" stop-color="#2F6BFF" stop-opacity="0"/></radialGradient>
-<linearGradient id="metal" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FBFCFD"/><stop offset=".28" stop-color="#C9CFD8"/><stop offset=".55" stop-color="#6E7685"/><stop offset=".78" stop-color="#D6DBE2"/><stop offset="1" stop-color="#40464F"/></linearGradient>
-<linearGradient id="bevel" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0A0D14"/><stop offset="1" stop-color="#3A4252"/></linearGradient>
-<radialGradient id="glass" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#0E2C6E"/><stop offset=".7" stop-color="#06112B"/><stop offset="1" stop-color="#020614"/></radialGradient>
-<linearGradient id="bladeA" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1B3678"/><stop offset="1" stop-color="#050A1C"/></linearGradient>
-<linearGradient id="bladeB" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#244494"/><stop offset="1" stop-color="#060D24"/></linearGradient>
-<radialGradient id="iris" cx="{CX}" cy="{CY}" r="{APOTHEM * 1.16:.2f}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".36" stop-color="#C2EEFF"/><stop offset=".7" stop-color="#3AA6FF"/><stop offset="1" stop-color="#1A56D6"/></radialGradient>
-<linearGradient id="wave" gradientUnits="userSpaceOnUse" x1="{CX + 28}" y1="{CY - 20}" x2="{CX + 41}" y2="{CY + 20}"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".55" stop-color="#D2ECFF"/><stop offset="1" stop-color="#9CCBFF"/></linearGradient>
-<linearGradient id="spec" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF" stop-opacity=".55"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></linearGradient>
-<clipPath id="glassClip"><circle cx="{CX}" cy="{CY}" r="{R_GLASS}"/></clipPath>
-<filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation=".45"/></filter>
-<filter id="glow" filterUnits="userSpaceOnUse" x="0" y="0" width="108" height="108"><feGaussianBlur stdDeviation="1.6"/></filter>
-<filter id="haze" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter>
-<filter id="drop" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.8"/></filter>
+
+def fibres():
+    """The iris's stroma: 260 curved fibres from the pupil's collar to the rim, in seven golds."""
+    rnd = random.Random(FIBRE_SEED)
+    out = []
+    for _ in range(260):
+        a = rnd.uniform(0, 2 * math.pi)
+        r0, r1 = rnd.uniform(7.2, 9), rnd.uniform(15.5, 21.5)
+        col = rnd.choice(("#FFE7A8", "#F2C65A", "#D99A2B", "#A86E1C", "#FFF4D6", "#C8902E", "#7A4E10"))
+        mid, bend = rnd.uniform(.3, .7), rnd.uniform(-.12, .12)
+        rm = r0 + (r1 - r0) * mid
+        out.append(f'<path d="M{CX + r0 * math.cos(a):.2f},{CY + r0 * math.sin(a):.2f} '
+                   f'Q{CX + rm * math.cos(a + bend):.2f},{CY + rm * math.sin(a + bend):.2f} '
+                   f'{CX + r1 * math.cos(a):.2f},{CY + r1 * math.sin(a):.2f}" stroke="{col}" '
+                   f'stroke-width="{rnd.uniform(.25, .6):.2f}" opacity="{rnd.uniform(.5, .95):.2f}" fill="none"/>')
+    return "".join(out)
+
+
+# Filter regions are in the tile's own space: a box-relative region on a thin arc is a few units
+# wide and cut the waves' glow into rectangles (13 Nov).
+DEFS = """<defs>
+<filter id="bl1" filterUnits="userSpaceOnUse" x="-20" y="-20" width="148" height="148"><feGaussianBlur stdDeviation=".9"/></filter>
+<filter id="bl2" filterUnits="userSpaceOnUse" x="-20" y="-20" width="148" height="148"><feGaussianBlur stdDeviation="2"/></filter>
+<filter id="bl8" filterUnits="userSpaceOnUse" x="-20" y="-20" width="148" height="148"><feGaussianBlur stdDeviation="8"/></filter>
+<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1E1C19"/><stop offset=".55" stop-color="#0C0B0A"/><stop offset="1" stop-color="#030303"/></linearGradient>
+<linearGradient id="gloss" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".07"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/></linearGradient>
+<radialGradient id="irisBase" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#FFF1C4"/><stop offset=".45" stop-color="#E0A63A"/><stop offset=".85" stop-color="#6E4410"/><stop offset="1" stop-color="#1A0F02"/></radialGradient>
+<radialGradient id="limbal" cx="50%" cy="50%" r="50%"><stop offset=".78" stop-color="#140B02" stop-opacity="0"/><stop offset="1" stop-color="#0A0601" stop-opacity=".95"/></radialGradient>
+<radialGradient id="collar" cx="50%" cy="50%" r="50%"><stop offset=".3" stop-color="#FFF1C4" stop-opacity="0"/><stop offset=".42" stop-color="#FFF1C4" stop-opacity=".55"/><stop offset=".6" stop-color="#FFF1C4" stop-opacity="0"/></radialGradient>
+<linearGradient id="metalRing" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF4CC"/><stop offset=".3" stop-color="#E8C268"/><stop offset=".55" stop-color="#7A4E10"/><stop offset=".78" stop-color="#F7D47E"/><stop offset="1" stop-color="#4A3008"/></linearGradient>
+<linearGradient id="waveG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF4D6"/><stop offset=".5" stop-color="#F2C65A"/><stop offset="1" stop-color="#C8902E"/></linearGradient>
+<radialGradient id="dotLit" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".5" stop-color="#FFE7A8"/><stop offset="1" stop-color="#E0A030"/></radialGradient>
+<linearGradient id="win" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".7"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
 </defs>"""
 
-BACKGROUND = ('<rect width="108" height="108" fill="url(#bg)"/><rect width="108" height="108" fill="url(#bgGlow)"/>'
-              '<rect width="108" height="108" fill="url(#sheen)"/>')
+BACKGROUND = '<rect width="108" height="108" fill="url(#bg)"/><rect width="108" height="108" fill="url(#gloss)"/>'
 
 WAVES_SVG = "".join(
-    f'<path d="{arc_path(r, WAVE_SPAN)}" fill="none" stroke="#7CC4FF" stroke-width="{w + 2.2:.2f}" stroke-opacity="{op * .35:.2f}" stroke-linecap="round" filter="url(#glow)"/>'
-    f'<path d="{arc_path(r, WAVE_SPAN)}" fill="none" stroke="url(#wave)" stroke-width="{w:.2f}" stroke-opacity="{op:.2f}" stroke-linecap="round"/>'
+    f'<path d="{arc_path(r, WAVE_SPAN)}" fill="none" stroke="#FFB84D" stroke-width="{w + 2}" opacity=".35" filter="url(#bl2)" stroke-linecap="round"/>'
+    f'<path d="{arc_path(r, WAVE_SPAN)}" fill="none" stroke="url(#waveG)" stroke-width="{w}" opacity="{op}" stroke-linecap="round"/>'
     for r, w, op in WAVES)
 
 ART = (
-    # the light the lens gives off, and its shadow on the field
-    f'<circle cx="{CX}" cy="{CY}" r="{R_BODY + 9}" fill="url(#aura)" filter="url(#haze)"/>'
-    + f'<circle cx="{CX + 1.5}" cy="{CY + 3}" r="{R_BODY}" fill="#000" opacity=".6" filter="url(#drop)"/>'
+    # the warm light the iris gives off, and its shadow
+    f'<circle cx="{CX}" cy="{CY}" r="30" fill="#FFB84D" opacity=".22" filter="url(#bl8)"/>'
+    + f'<circle cx="{CX + 1}" cy="{CY + 2.5}" r="{R_RING}" fill="#000" opacity=".7" filter="url(#bl2)"/>'
     + WAVES_SVG
-    # barrel: brushed metal, a dark bevel, the black inner barrel with its cyan index ring
-    + f'<circle cx="{CX}" cy="{CY}" r="{R_BODY}" fill="url(#metal)"/>'
-    + f'<circle cx="{CX}" cy="{CY}" r="{R_BODY - .6}" fill="none" stroke="#FFFFFF" stroke-opacity=".35" stroke-width=".4"/>'
-    + f'<circle cx="{CX}" cy="{CY}" r="{R_BODY - 2.2}" fill="url(#bevel)"/>'
-    + f'<circle cx="{CX}" cy="{CY}" r="{R_GLASS + 1.9}" fill="#03060F"/>'
-    + f'<circle cx="{CX}" cy="{CY}" r="{R_GLASS + 1.0}" fill="none" stroke="#7CC4FF" stroke-opacity=".6" stroke-width=".45"/>'
-    # glass and the shutter inside it
-    + f'<circle cx="{CX}" cy="{CY}" r="{R_GLASS}" fill="url(#glass)"/>'
-    + f'<g clip-path="url(#glassClip)">{blades()}<circle cx="{CX}" cy="{CY}" r="{APOTHEM * 2.1:.2f}" fill="url(#spill)"/></g>'
-    # the iris lit from within, the pupil, its white-hot rim
-    + f'<polygon points="{HEX}" fill="url(#iris)"/>'
-    + f'<polygon points="{HEX}" fill="none" stroke="#FFFFFF" stroke-opacity=".5" stroke-width=".3"/>'
-    + f'<circle cx="{CX}" cy="{CY}" r="{R_PUPIL + .7}" fill="#D6F3FF" opacity=".8" filter="url(#soft)"/>'
+    # the polished gold ring
+    + f'<circle cx="{CX}" cy="{CY}" r="{R_RING}" fill="url(#metalRing)"/>'
+    + f'<circle cx="{CX}" cy="{CY}" r="{R_RING - .1}" fill="none" stroke="#FFF6D8" stroke-opacity=".6" stroke-width=".35"/>'
+    + f'<circle cx="{CX}" cy="{CY}" r="{R_IRIS + .4}" fill="#0A0704"/>'
+    # the iris: base colour, fibres, the bright collar round the pupil, the dark limbal ring
+    + f'<circle cx="{CX}" cy="{CY}" r="{R_IRIS}" fill="url(#irisBase)"/>'
+    + fibres()
+    + f'<circle cx="{CX}" cy="{CY}" r="{R_IRIS}" fill="url(#collar)"/>'
+    + f'<circle cx="{CX}" cy="{CY}" r="{R_IRIS}" fill="url(#limbal)"/>'
+    # the pupil, and the braille "i" glowing in it
     + f'<circle cx="{CX}" cy="{CY}" r="{R_PUPIL}" fill="#000"/>'
-    # the iris's light falling on the blades, and one soft violet reflection of the coating
-    + f'<g clip-path="url(#glassClip)">'
-    + f'<ellipse cx="{CX + 6}" cy="{CY + 9}" rx="9" ry="3.4" transform="rotate(-38 {CX + 6} {CY + 9})" fill="#FFB866" opacity=".14" filter="url(#glow)"/>'
-    # catchlights: a broad soft window top left, a sharp one, a small one opposite
-    + f'<ellipse cx="{CX - 7.5}" cy="{CY - 8.5}" rx="10" ry="5.2" transform="rotate(-38 {CX - 7.5} {CY - 8.5})" fill="url(#spec)" opacity=".55"/>'
-    + '</g>'
-    + f'<ellipse cx="{CX - 4.6}" cy="{CY - 4.8}" rx="2.1" ry="1.1" transform="rotate(-40 {CX - 4.6} {CY - 4.8})" fill="#FFFFFF" opacity=".95"/>'
-    + f'<circle cx="{CX + 5.6}" cy="{CY + 6.0}" r=".75" fill="#FFFFFF" opacity=".7"/>'
-    # a glint of light on the barrel's top edge
-    + ring_arc(R_BODY - .3, 220, 290, "#FFFFFF", .7, .8)
+    + f'<circle cx="{CX}" cy="{CY}" r="{R_PUPIL}" fill="none" stroke="#FFD27A" stroke-opacity=".35" stroke-width=".3"/>'
+    + braille()
+    # catchlights: a soft window top left, a small one opposite
+    + f'<ellipse cx="{CX - 8}" cy="{CY - 9}" rx="7.5" ry="3.8" transform="rotate(-35 {CX - 8} {CY - 9})" fill="url(#win)"/>'
+    + f'<circle cx="{CX + 7}" cy="{CY + 7.5}" r=".9" fill="#fff" opacity=".7"/>'
 )
 
 
@@ -171,7 +155,7 @@ def scaled(body, k):
     return f'<g transform="translate(54 54) scale({k:.5f}) translate(-54 -54)">{body}</g>'
 
 
-MASTER = svg(BACKGROUND + '<rect width="108" height="108" fill="url(#vignette)"/>' + ART)
+MASTER = svg(BACKGROUND + ART)
 FOREGROUND = svg(scaled(ART, FG_SCALE))      # transparent field
 BACKGROUND_ONLY = svg(BACKGROUND)
 
@@ -184,20 +168,20 @@ def write(path, text):
 
 # ---- vectors: the reduced mark for the themed icon and the status bar --------------------
 def mark_paths(k, colour):
-    """The mark in one colour, scaled by k about the tile's centre: the barrel as a ring, the
-    glass solid with the aperture cut out and the pupil inside it, and the three waves."""
+    """The mark in one colour, scaled by k about the tile's centre: the ring, the iris solid with
+    the pupil cut out, the two raised braille dots standing in the pupil, and the two waves."""
     def p(x, y):
         return 54 + (x - 54) * k, 54 + (y - 54) * k
     def circle(r, cx=CX, cy=CY):
         x, y = p(cx - r, cy); rr = r * k
         return f"M{x:.2f},{y:.2f} a{rr:.2f},{rr:.2f} 0 1,0 {2 * rr:.2f},0 a{rr:.2f},{rr:.2f} 0 1,0 {-2 * rr:.2f},0"
-    out = (f'<path android:pathData="{circle(R_BODY - 1.6)}" android:strokeColor="{colour}" '
-           f'android:strokeWidth="{2.6 * k:.2f}" android:fillColor="#00000000"/>')
-    # the glass solid, the aperture cut out of it, the pupil left standing inside: a lens, not a nut
-    hexd = "M" + " L".join(f"{p(x, y)[0]:.2f},{p(x, y)[1]:.2f}" for x, y in hexagon()) + "Z "
-    out += (f'<path android:pathData="{circle(R_GLASS)} {hexd}" android:fillColor="{colour}" '
+    out = (f'<path android:pathData="{circle(R_RING - .8)}" android:strokeColor="{colour}" '
+           f'android:strokeWidth="{1.6 * k:.2f}" android:fillColor="#00000000"/>')
+    out += (f'<path android:pathData="{circle(R_IRIS - 1.6)} {circle(R_PUPIL + .6)}" android:fillColor="{colour}" '
             f'android:fillType="evenOdd"/>')
-    out += f'<path android:pathData="{circle(R_PUPIL + .6)}" android:fillColor="{colour}"/>'
+    for x, y, raised in braille_dots():
+        if raised:
+            out += f'<path android:pathData="{circle(DOT_R * 1.5, x, y)}" android:fillColor="{colour}"/>'
     for r, w, _ in WAVES:
         x0, y0 = p(*pt(r, -WAVE_SPAN)); x1, y1 = p(*pt(r, WAVE_SPAN))
         out += (f'<path android:pathData="M{x0:.2f},{y0:.2f} A{r * k:.2f},{r * k:.2f} 0 0,1 {x1:.2f},{y1:.2f}" '
@@ -210,14 +194,15 @@ VECTOR_HEAD = ('<?xml version="1.0" encoding="utf-8"?>\n<vector xmlns:android="h
                '    android:width="{w}dp" android:height="{w}dp" android:viewportWidth="108" android:viewportHeight="108">\n')
 
 MONOCHROME = (VECTOR_HEAD.format(w=108)
-              + "    <!-- The themed icon: the lens, its aperture and the three waves, in one colour the\n"
-              "         launcher tints. Built by store-assets/icon/build_icon.py; do not edit by hand. -->\n"
-              + mark_paths(.92, "#FF000000") + "\n</vector>\n")
+              + "    <!-- The themed icon: the ring, the iris, the braille i in its pupil and the two waves,\n"
+              "         in one colour the launcher tints. Built by store-assets/icon/build_icon.py; do not\n"
+              "         edit by hand. -->\n"
+              + mark_paths(.95, "#FF000000") + "\n</vector>\n")
 
 NOTIFICATION = (VECTOR_HEAD.format(w=24)
                 + "    <!-- Status-bar glyph: white on transparent, the same reduced mark, filling the canvas.\n"
                 "         Built by store-assets/icon/build_icon.py. -->\n"
-                + mark_paths(1.3, "#FFFFFFFF") + "\n</vector>\n")
+                + mark_paths(1.4, "#FFFFFFFF") + "\n</vector>\n")
 
 ADAPTIVE = ('<?xml version="1.0" encoding="utf-8"?>\n'
             '<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">\n'
@@ -229,13 +214,13 @@ ADAPTIVE = ('<?xml version="1.0" encoding="utf-8"?>\n'
 FEATURE = f'''<!doctype html><html><head><meta charset="utf-8"><style>
 @font-face{{font-family:"Space Grotesk";font-weight:700;src:url("../../app/src/main/res/font/space_grotesk_bold.ttf")}}
 @font-face{{font-family:"Space Grotesk";font-weight:400;src:url("../../app/src/main/res/font/space_grotesk_regular.ttf")}}
-body{{margin:0;width:1024px;height:500px;overflow:hidden;background:radial-gradient(120% 140% at 20% 50%,#0A1830 0%,#050B18 55%,#02050C 100%);
-font-family:"Space Grotesk",Inter,system-ui,sans-serif;color:#F4F1EA}}
-.icon{{position:absolute;left:84px;top:94px;width:312px;height:312px;border-radius:84px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.6)}}
+body{{margin:0;width:1024px;height:500px;overflow:hidden;background:radial-gradient(120% 140% at 20% 50%,#24201A 0%,#0C0B0A 55%,#030303 100%);
+font-family:"Space Grotesk",Inter,system-ui,sans-serif;color:#F7EEDB}}
+.icon{{position:absolute;left:84px;top:94px;width:312px;height:312px;border-radius:84px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.7),0 0 90px rgba(255,184,77,.18)}}
 .icon svg{{width:100%;height:100%;display:block}}
 h1{{position:absolute;left:460px;top:150px;margin:0;font-size:92px;letter-spacing:-3px;font-weight:700}}
-p{{position:absolute;left:464px;top:262px;margin:0;font-size:31px;color:#A8C8E8;max-width:520px;line-height:1.3}}
-.ml{{position:absolute;left:466px;top:352px;font-size:26px;color:#6FB7F0}}
+p{{position:absolute;left:464px;top:262px;margin:0;font-size:31px;color:#D9C9A6;max-width:520px;line-height:1.3}}
+.ml{{position:absolute;left:466px;top:352px;font-size:26px;color:#E8C268}}
 </style></head><body><div class="icon">{MASTER}</div><h1>Ikshana</h1>
 <p>A camera that answers, and cannot upload what it sees.</p><div class="ml">ഈക്ഷണ · ईक्षण</div></body></html>'''
 

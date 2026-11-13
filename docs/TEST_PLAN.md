@@ -26,8 +26,8 @@ Log tags, read by the session throughout:
 
 | Step | Pass |
 |---|---|
-| Look at the home screen and the app drawer | A metal camera lens on blue-to-violet, its aperture an eye (six blades, blue iris, black pupil), three sound waves to the right; the lens clear of the round edge |
-| If themed icons are on (wallpaper and style, then themed icons) | The one-colour mark: a solid lens with the six-sided aperture cut out, a pupil, three wave arcs |
+| Look at the home screen and the app drawer | The golden iris on black: a gold iris drawn fibre by fibre in a polished gold ring, two glowing braille dots in the black pupil, two gold waves to the right; clear of the round edge |
+| If themed icons are on (wallpaper and style, then themed icons) | The one-colour mark: a ring, a solid iris with the pupil cut out, two dots in the pupil, two wave arcs |
 | Notification shade while Ikshana runs, if a notification shows | The same small mark |
 
 ## 2. Start (owner, 2 min)
