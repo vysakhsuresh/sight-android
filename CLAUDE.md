@@ -122,6 +122,9 @@ must end at Help.
   "Dark." in a lit room. Anything that reads brightness waits `LightLevel.SETTLE_MS`.
 - **Bash heredocs containing `'` or `'''` broke the Bash tool's parser twice.** Write a script
   file with the Write tool and run it instead; check every scripted edit landed (grep or cmp).
+- **Run the icon builder from the Bash tool, not the PowerShell tool.** From PowerShell, headless
+  Edge and Chrome both exit writing no screenshot (13 Nov), and leave hung headless processes on
+  the icon profile; the same script from Git Bash renders all 22 files.
 - **`msedge.exe --headless --screenshot` returns before the file exists**, and a running Edge
   swallows the job unless `--user-data-dir` is its own; `render_edge.py` waits for the file.
 - **`jc.sh` looks for jars in the Gradle cache, then `~/.ikshana-kt`, then `~/.stave-kt`**: the

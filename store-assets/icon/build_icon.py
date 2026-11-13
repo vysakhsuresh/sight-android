@@ -86,7 +86,7 @@ def blades():
         poly = [a, b, e_k] + rim + [e_prev]
         pts = " ".join(f"{x:.2f},{y:.2f}" for x, y in poly)
         shade = "url(#bladeA)" if k % 2 == 0 else "url(#bladeB)"
-        out.append(f'<polygon points="{pts}" fill="{shade}" stroke="#6FD3FF" stroke-opacity=".38" stroke-width=".35" stroke-linejoin="round"/>')
+        out.append(f'<polygon points="{pts}" fill="{shade}" stroke="#6FD3FF" stroke-opacity=".28" stroke-width=".35" stroke-linejoin="round"/>')
     return "".join(out)
 
 
@@ -105,20 +105,20 @@ def ring_arc(r, a0, a1, colour, width, op):
 HEX = " ".join(f"{x:.2f},{y:.2f}" for x, y in hexagon())
 
 DEFS = f"""<defs>
-<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3A7BFF"/><stop offset=".45" stop-color="#1638B8"/><stop offset=".8" stop-color="#1A0F6B"/><stop offset="1" stop-color="#12053F"/></linearGradient><radialGradient id="bgGlow" cx="30%" cy="22%" r="60%"><stop offset="0" stop-color="#9FE7FF" stop-opacity=".45"/><stop offset="1" stop-color="#9FE7FF" stop-opacity="0"/></radialGradient><radialGradient id="spill" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#6FD3FF" stop-opacity=".55"/><stop offset=".55" stop-color="#2F6BFF" stop-opacity=".18"/><stop offset="1" stop-color="#2F6BFF" stop-opacity="0"/></radialGradient><radialGradient id="vignette" cx="50%" cy="50%" r="50%"><stop offset=".72" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".35"/></radialGradient>
+<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2C6BF2"/><stop offset=".42" stop-color="#1A47C8"/><stop offset=".78" stop-color="#0F2A86"/><stop offset="1" stop-color="#0A1A5A"/></linearGradient><radialGradient id="bgGlow" cx="30%" cy="22%" r="60%"><stop offset="0" stop-color="#DCEBFF" stop-opacity=".2"/><stop offset="1" stop-color="#DCEBFF" stop-opacity="0"/></radialGradient><radialGradient id="spill" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#5FC8FF" stop-opacity=".45"/><stop offset=".55" stop-color="#2F6BFF" stop-opacity=".14"/><stop offset="1" stop-color="#2F6BFF" stop-opacity="0"/></radialGradient><radialGradient id="vignette" cx="50%" cy="50%" r="50%"><stop offset=".7" stop-color="#030A2A" stop-opacity="0"/><stop offset="1" stop-color="#030A2A" stop-opacity=".4"/></radialGradient>
 <linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF" stop-opacity=".07"/><stop offset=".5" stop-color="#FFFFFF" stop-opacity="0"/></linearGradient>
-<radialGradient id="aura" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#6FD3FF" stop-opacity=".55"/><stop offset=".6" stop-color="#2F6BFF" stop-opacity=".18"/><stop offset="1" stop-color="#2F6BFF" stop-opacity="0"/></radialGradient>
-<linearGradient id="metal" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F4F8FF"/><stop offset=".28" stop-color="#B9C7DE"/><stop offset=".55" stop-color="#5D6E8E"/><stop offset=".78" stop-color="#C9D5EA"/><stop offset="1" stop-color="#3A4763"/></linearGradient>
-<linearGradient id="bevel" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#050A16"/><stop offset="1" stop-color="#34466E"/></linearGradient>
-<radialGradient id="glass" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#12357A"/><stop offset=".7" stop-color="#081633"/><stop offset="1" stop-color="#03081A"/></radialGradient>
-<linearGradient id="bladeA" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22408A"/><stop offset="1" stop-color="#060C20"/></linearGradient>
-<linearGradient id="bladeB" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2B4FA6"/><stop offset="1" stop-color="#081028"/></linearGradient>
-<radialGradient id="iris" cx="{CX}" cy="{CY}" r="{APOTHEM * 1.16:.2f}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".38" stop-color="#A8ECFF"/><stop offset=".7" stop-color="#2FA8FF"/><stop offset="1" stop-color="#1550C8"/></radialGradient>
-<linearGradient id="wave" gradientUnits="userSpaceOnUse" x1="{CX + 28}" y1="{CY - 20}" x2="{CX + 41}" y2="{CY + 20}"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".55" stop-color="#9FE7FF"/><stop offset="1" stop-color="#6FD3FF"/></linearGradient>
+<radialGradient id="aura" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#7CCBFF" stop-opacity=".32"/><stop offset=".6" stop-color="#2F6BFF" stop-opacity=".12"/><stop offset="1" stop-color="#2F6BFF" stop-opacity="0"/></radialGradient>
+<linearGradient id="metal" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FBFCFD"/><stop offset=".28" stop-color="#C9CFD8"/><stop offset=".55" stop-color="#6E7685"/><stop offset=".78" stop-color="#D6DBE2"/><stop offset="1" stop-color="#40464F"/></linearGradient>
+<linearGradient id="bevel" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0A0D14"/><stop offset="1" stop-color="#3A4252"/></linearGradient>
+<radialGradient id="glass" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#0E2C6E"/><stop offset=".7" stop-color="#06112B"/><stop offset="1" stop-color="#020614"/></radialGradient>
+<linearGradient id="bladeA" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1B3678"/><stop offset="1" stop-color="#050A1C"/></linearGradient>
+<linearGradient id="bladeB" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#244494"/><stop offset="1" stop-color="#060D24"/></linearGradient>
+<radialGradient id="iris" cx="{CX}" cy="{CY}" r="{APOTHEM * 1.16:.2f}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".36" stop-color="#C2EEFF"/><stop offset=".7" stop-color="#3AA6FF"/><stop offset="1" stop-color="#1A56D6"/></radialGradient>
+<linearGradient id="wave" gradientUnits="userSpaceOnUse" x1="{CX + 28}" y1="{CY - 20}" x2="{CX + 41}" y2="{CY + 20}"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".55" stop-color="#D2ECFF"/><stop offset="1" stop-color="#9CCBFF"/></linearGradient>
 <linearGradient id="spec" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF" stop-opacity=".55"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></linearGradient>
 <clipPath id="glassClip"><circle cx="{CX}" cy="{CY}" r="{R_GLASS}"/></clipPath>
 <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation=".45"/></filter>
-<filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.6"/></filter>
+<filter id="glow" filterUnits="userSpaceOnUse" x="0" y="0" width="108" height="108"><feGaussianBlur stdDeviation="1.6"/></filter>
 <filter id="haze" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter>
 <filter id="drop" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.8"/></filter>
 </defs>"""
@@ -127,7 +127,7 @@ BACKGROUND = ('<rect width="108" height="108" fill="url(#bg)"/><rect width="108"
               '<rect width="108" height="108" fill="url(#sheen)"/>')
 
 WAVES_SVG = "".join(
-    f'<path d="{arc_path(r, WAVE_SPAN)}" fill="none" stroke="#6FD3FF" stroke-width="{w + 2.2:.2f}" stroke-opacity="{op * .45:.2f}" stroke-linecap="round" filter="url(#glow)"/>'
+    f'<path d="{arc_path(r, WAVE_SPAN)}" fill="none" stroke="#7CC4FF" stroke-width="{w + 2.2:.2f}" stroke-opacity="{op * .35:.2f}" stroke-linecap="round" filter="url(#glow)"/>'
     f'<path d="{arc_path(r, WAVE_SPAN)}" fill="none" stroke="url(#wave)" stroke-width="{w:.2f}" stroke-opacity="{op:.2f}" stroke-linecap="round"/>'
     for r, w, op in WAVES)
 
@@ -141,18 +141,18 @@ ART = (
     + f'<circle cx="{CX}" cy="{CY}" r="{R_BODY - .6}" fill="none" stroke="#FFFFFF" stroke-opacity=".35" stroke-width=".4"/>'
     + f'<circle cx="{CX}" cy="{CY}" r="{R_BODY - 2.2}" fill="url(#bevel)"/>'
     + f'<circle cx="{CX}" cy="{CY}" r="{R_GLASS + 1.9}" fill="#03060F"/>'
-    + f'<circle cx="{CX}" cy="{CY}" r="{R_GLASS + 1.0}" fill="none" stroke="#6FD3FF" stroke-opacity=".75" stroke-width=".45"/>'
+    + f'<circle cx="{CX}" cy="{CY}" r="{R_GLASS + 1.0}" fill="none" stroke="#7CC4FF" stroke-opacity=".6" stroke-width=".45"/>'
     # glass and the shutter inside it
     + f'<circle cx="{CX}" cy="{CY}" r="{R_GLASS}" fill="url(#glass)"/>'
     + f'<g clip-path="url(#glassClip)">{blades()}<circle cx="{CX}" cy="{CY}" r="{APOTHEM * 2.1:.2f}" fill="url(#spill)"/></g>'
     # the iris lit from within, the pupil, its white-hot rim
     + f'<polygon points="{HEX}" fill="url(#iris)"/>'
     + f'<polygon points="{HEX}" fill="none" stroke="#FFFFFF" stroke-opacity=".5" stroke-width=".3"/>'
-    + f'<circle cx="{CX}" cy="{CY}" r="{R_PUPIL + .7}" fill="#BDF0FF" opacity=".8" filter="url(#soft)"/>'
+    + f'<circle cx="{CX}" cy="{CY}" r="{R_PUPIL + .7}" fill="#D6F3FF" opacity=".8" filter="url(#soft)"/>'
     + f'<circle cx="{CX}" cy="{CY}" r="{R_PUPIL}" fill="#000"/>'
     # the iris's light falling on the blades, and one soft violet reflection of the coating
     + f'<g clip-path="url(#glassClip)">'
-    + f'<ellipse cx="{CX + 6}" cy="{CY + 9}" rx="9" ry="3.4" transform="rotate(-38 {CX + 6} {CY + 9})" fill="#A98BFF" opacity=".22" filter="url(#glow)"/>'
+    + f'<ellipse cx="{CX + 6}" cy="{CY + 9}" rx="9" ry="3.4" transform="rotate(-38 {CX + 6} {CY + 9})" fill="#FFB866" opacity=".14" filter="url(#glow)"/>'
     # catchlights: a broad soft window top left, a sharp one, a small one opposite
     + f'<ellipse cx="{CX - 7.5}" cy="{CY - 8.5}" rx="10" ry="5.2" transform="rotate(-38 {CX - 7.5} {CY - 8.5})" fill="url(#spec)" opacity=".55"/>'
     + '</g>'
